@@ -15,6 +15,7 @@ class UserProfile(models.Model):
     roles = models.ManyToManyField(Role, related_name='users')
     email = models.EmailField(max_length=254, unique=True)
     phone = models.CharField(max_length=15)
+    
 
     def __str__(self):
         return self.fullname
@@ -24,3 +25,21 @@ class UserProfile(models.Model):
             default_role = Role.create_default_role()
             self.roles.add(default_role)
         super(UserProfile, self).save(*args, **kwargs)
+
+
+class Faculties(models.Model):
+    name = models.CharField(max_length = 40)
+
+class Contributions(models.Model):
+    title = models.CharField(max_length=30)
+    content = models.TextField(null = True)
+    status = models.CharField(max_length=30,null = True)
+    term = models.BooleanField(null = True)
+    user = models.ManyToManyField(UserProfile)
+    faculty = models.ForeignKey(Faculties,on_delete=models.CASCADE)
+    createAt = models.DateTimeField(auto_now_add=True)
+
+class ContributionFiles(models.Model):
+    word = models.FileField(null = True)
+    img = models.FileField(null = True)
+    contribution = models.ManyToManyField(Contributions)

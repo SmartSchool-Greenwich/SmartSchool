@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type=text],
+        input[type=email],
+        input[type=password],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type=submit] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #4a73c8;
+        }
+
+        .container{
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <label for="id_username">Username:</label>
+            <input type="text" name="username" id="id_username" required>
+            
+            
+            <label for="id_password">Password:</label>
+            <input type="password" name="password" id="id_password" required>
+            
+            <label for="id_confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="id_confirm_password" required>
+            
+            <label for="id_fullname">Full Name:</label>
+            <input type="text" name="fullname" id="id_fullname" required>
+            
+            <label for="id_phone">Phone:</label>
+            <input type="text" name="phone" id="id_phone">
+            
+            <label for="id_role">Role:</label>
+            <select name="role" id="id_role" required>
+                {% for role in user_form.fields.role.queryset %}
+                    <option value="{{ role.pk }}">{{ role.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="submit" value="Register">
+        </form>
+    </div>
+</body>
+</html>

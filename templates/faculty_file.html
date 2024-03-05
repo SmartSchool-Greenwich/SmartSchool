@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Files for {{ faculty.name }}</title>
+</head>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+    }
+    h2 {
+        color: #333;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    li {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    a {
+        text-decoration: none;
+        color: #0066cc;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    <h2>Files in the {{ faculty.name }} Faculty</h2>
+    {% if files %}
+        <ul>
+            {% for file in files %}
+                <li>
+                    {% if file.word %}Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a>{% endif %}
+                    {% if file.img %}Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No files available for this faculty.</p>
+    {% endif %}
+</body>
+</html>
