@@ -8,6 +8,6 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('upload/', views.file_upload_view, name='file_upload'),
     path('upload/success/', views.upload_success, name='success_url'),
-    path('create_account/', views.craete_account, name='create_account'),
+    path('create_account/', views.create_account, name='create_account'),
     path('faculties/<int:faculty_id>/files/', views.faculty_files, name='faculty_files'),
 ]

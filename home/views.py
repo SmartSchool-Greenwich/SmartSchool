@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .models import ContributionFiles, UserProfile  ,Faculties,Contributions
-from .forms import ContributionFileForm ,UserRegistrationForm,UserProfileForm,ContributionForm
+from django.contrib.auth import authenticate, login, logout
+from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role
 from django.contrib.auth.decorators import login_required
 
 def login_view(request):
@@ -10,128 +9,140 @@ def login_view(request):
         return redirect('home')
     
     if request.method == 'POST':
-        email = request.POST.get('email').lower()
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
 
-        # Authenticate using username
         try:
-            user_obj = User.objects.get(email=email)
-            user = authenticate(request, username=user_obj.username, password=password)
-            
-            if user is not None:
-                auth_login(request, user)
-                return redirect('home')
-            else:
-                pass  # Handle error
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
-            pass  # Handle error
+            pass
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            pass
 
     return render(request, 'login.html')
 
 def register_view(request):
     if request.method == 'POST':
-        # Get form data
-        email = request.POST.get('email')
-        fullname = request.POST.get('fullname')
-        phone = request.POST.get('phone')
-        password = request.POST.get('password')
-        repassword = request.POST.get('repassword')
+        if request.POST['username'] and request.POST['fullname'] and request.POST['phone'] and request.POST['password'] and request.POST['repassword']:
+            username =  request.POST['username']
+            email = request.POST.get('email')
+            fullname = request.POST.get('fullname')
+            phone = request.POST.get('phone')
+            password = request.POST.get('password')
+            repassword = request.POST.get('repassword')
 
         if password == repassword:
-            if not User.objects.filter(email=email).exists():
-                user = User.objects.create_user(username=email, email=email, password=password)
-                userprofile = UserProfile.objects.create(user=user, fullname=fullname, email=email, phone=phone)
+            if User.objects.filter(username = username).exists():
+                return redirect('register')
+            else:
+                user = User.objects.create_user(username=username,password=password,email=email)   
                 user.save()
+                
+                userprofile = UserProfile(user=user, fullname=fullname, email=email, phone=phone)
                 userprofile.save()
                 return redirect('login')
-            else:
-                pass  # Handle error: user already exists
         else:
-            pass  # Handle error: passwords do not match
+            return redirect('register') 
 
     return render(request, 'register.html')
 
 def logout_view(request):
-    auth_logout(request)
+    logout(request)
     return redirect('home')
 
 def home(request):
     faculties = Faculties.objects.all()
-    context = { 'faculties':faculties
+    context = { 
+        'faculties':faculties
     }
     return render(request, 'home.html', context)
 
 
 
-@login_required
+
 def file_upload_view(request):
-    faculties = Faculties.objects.all()  # If needed for the form
+    faculties = Faculties.objects.all()
     if request.method == 'POST':
-        contribution_form = ContributionForm(request.POST)
-        if contribution_form.is_valid():
-            contribution = contribution_form.save(commit=False)
-            contribution.faculty = contribution_form.cleaned_data['faculty']  # Assuming faculty is a field in your form
-            contribution.save()
-            contribution.user.add(request.user.userprofile)  # Associate the current user's profile with the contribution
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        faculty_id = request.POST.get('faculty')
+        term = request.POST.get('term') == 'on'
+        
+        try:
+            faculty = Faculties.objects.get(id=faculty_id)
+            contribution = Contributions.objects.create(
+                title=title,
+                content=content,
+                faculty=faculty,
+                term=term
+            )
+            contribution.user.add(request.user.userprofile)
+            
+            # Vòng lặp xử lý mỗi file được upload
+            contribution_file = ContributionFiles(contribution=contribution)  # Tạo đối tượng mới cho mỗi file
+            for file in request.FILES.getlist('word') + request.FILES.getlist('img'):
+                if file.name.endswith('.doc') or file.name.endswith('.docx'):
+                    contribution_file.word = file
+                else:
+                    contribution_file.img = file
+                contribution_file.save()
 
-            # Handling file uploads
-            files = request.FILES.getlist('word') + request.FILES.getlist('img')
-            for file in files:
-                ContributionFiles.objects.create(
-                    word=file if file.name.endswith('.docx') or file.name.endswith('.doc') else None,
-                    img=file if not (file.name.endswith('.docx') or file.name.endswith('.doc')) else None,
-                    contribution=contribution
-                )
-
-            return redirect('success_url')  # Redirect to a success page.
+            return redirect('success_url') 
+        except Faculties.DoesNotExist:
+            return redirect('home')
+        except Exception as e:
+            print(e)  # Ghi rõ lỗi ra để dễ dàng gỡ rối
+            return redirect('home')
+    
     else:
-        contribution_form = ContributionForm()
+        context = {'faculties': faculties}
+        
+    return render(request, 'upload.html', context)
 
-    return render(request, 'upload.html', {
-        'contribution_form': contribution_form,
-        'faculties': faculties
-    })
 
 def upload_success(request):
     return render(request, 'upload_success.html')
 
 
-
-
-def craete_account(request):
+def create_account(request):
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        profile_form = UserProfileForm(request.POST)
-        if user_form.is_valid() and profile_form.is_valid():
-            # Create a new user object but avoid saving it yet
-            new_user = user_form.save(commit=False)
-            # Set the chosen password
-            new_user.set_password(user_form.cleaned_data['password'])
-            # Save the User object
-            new_user.save()
-            # Create the user profile
-            new_profile = profile_form.save(commit=False)
-            new_profile.user = new_user
-            new_profile.save()
-            # Add the selected role to the user's profile
-            role = user_form.cleaned_data['role']
-            new_profile.roles.add(role)
-            new_profile.save()
+        username = request.POST['username']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        fullname = request.POST['fullname']
+        phone = request.POST.get('phone', '')  # Giá trị mặc định là chuỗi rỗng nếu không có
+        role_id = request.POST['role']
+
+        if password == confirm_password:
+            # Tạo user mới
+            user = User.objects.create_user(username=username, password=password)
+            
+            # Tạo UserProfile mới và lưu ngay lập tức
+            new_profile = UserProfile(user=user, fullname=fullname, phone=phone)
+            new_profile.save()  # Lưu UserProfile để có thể thêm vào role
+
+            # Thêm role vào UserProfile
+            selected_role = Role.objects.get(id=role_id)  # Lấy role từ ID
+            new_profile.roles.add(selected_role)  # Không cần gọi save() sau khi thêm role
+
             return redirect('login')  # Redirect to a login page after successful registration
-    else:
-        user_form = UserRegistrationForm()
-        profile_form = UserProfileForm()
-    return render(request, 'create_account.html', {'user_form': user_form, 'profile_form': profile_form})
+        else:
+            # Thêm logic xử lý lỗi nếu mật khẩu không khớp hoặc thông tin không đầy đủ
+            pass  
 
-
+    roles = Role.objects.all()  # Lấy tất cả roles cho dropdown
+    return render(request, 'create_account.html', {'roles': roles})
 
 
 def faculty_files(request, faculty_id):
-    # Fetch the specific faculty
     faculty = get_object_or_404(Faculties, pk=faculty_id)
-    # Fetch contributions associated with the faculty
     contributions = Contributions.objects.filter(faculty=faculty)
-    # Fetch files associated with those contributions
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
     
     return render(request, 'faculty_file.html', {'faculty': faculty, 'files': files})
