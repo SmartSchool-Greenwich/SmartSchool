@@ -206,8 +206,9 @@ https://templatemo.com/tm-569-edu-meeting
                 <li>
                   {% if file.word %} Document:
                   <a href="{{ file.word.url }}">{{ file.word.name }}</a> 
-                  {% endif %} Image:
+                  {% elif file.image %} Image:
                   <a href="{{ file.img.url }}">{{ file.img.name }}</a>
+                  {% endif %}
                 </li>
               </div>
               <div class="feedback-box">

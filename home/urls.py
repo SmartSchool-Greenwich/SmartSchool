@@ -11,5 +11,7 @@ urlpatterns = [
     path('create_account/', views.create_account, name='create_account'),
     path('faculties/<int:faculty_id>/files/', views.faculty_files, name='faculty_files'),
     path('create_faculties/', views.create_faculty, name='faculty-add'),
+    path('show-contributions/', views.show_contributions, name='show_contributions'),
+    path('download/contributions/', views.download_selected_contributions, name='download_selected_contributions'),
 
 ]

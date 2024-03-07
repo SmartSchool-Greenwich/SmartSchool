@@ -6,6 +6,8 @@ from .models import ContributionFiles, UserProfile, Faculties, Contributions, Ro
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_datetime
 from .forms import CommentForm
+import zipfile
+from io import BytesIO
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -177,3 +179,31 @@ def faculty_files(request, faculty_id):
             except Contributions.DoesNotExist:
                 return HttpResponse("Contribution does not exist", status=404)
     return render(request, 'faculty_file.html', {'faculty': faculty, 'files': files})
+
+def show_contributions(request):
+    # Lấy tất cả contributions từ database
+    contributions = Contributions.objects.all()
+    
+    # Render template, truyền 'contributions' vào context để có thể sử dụng trong template
+    return render(request, 'show_contribution.html', {'contributions': contributions})
+
+
+#download file zip
+def download_selected_contributions(request):
+    contribution_ids = request.POST.getlist('contribution_ids')
+    files = ContributionFiles.objects.filter(contribution__id__in=contribution_ids)
+
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for file in files:
+            if file.word:
+                zip_file.write(file.word.path, arcname=file.word.name)
+            if file.img:
+                zip_file.write(file.img.path, arcname=file.img.name)
+
+    zip_buffer.seek(0)
+
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="selected_contributions.zip"'
+
+    return response
