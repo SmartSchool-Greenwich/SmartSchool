@@ -1,8 +1,11 @@
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role
+from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role,AcademicYear
 from django.contrib.auth.decorators import login_required
+from django.utils.dateparse import parse_datetime
+from .forms import CommentForm
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -140,9 +143,37 @@ def create_account(request):
     return render(request, 'create_account.html', {'roles': roles})
 
 
+def create_faculty(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        closure = parse_datetime(request.POST.get('closure'))
+        finalClosure = parse_datetime(request.POST.get('finalClosure'))
+
+        if name and closure and finalClosure:
+            faculty = Faculties.objects.create(name=name)
+            AcademicYear.objects.create(faculties=faculty, closure=closure, finalClosure=finalClosure)
+            return redirect('home') 
+         # Điều hướng đến URL danh sách Faculties sau khi tạo
+    return render(request, 'faculty_create.html')
+
 def faculty_files(request, faculty_id):
     faculty = get_object_or_404(Faculties, pk=faculty_id)
     contributions = Contributions.objects.filter(faculty=faculty)
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
-    
+    comment_form = CommentForm()
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            contribution_id = request.POST.get('contribution_id')
+            try:
+                contribution = Contributions.objects.get(id=contribution_id)
+                new_comment = comment_form.save(commit=False)
+                new_comment.contribution = contribution
+            # Sử dụng UserProfile thay vì User
+                user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+                new_comment.user = user_profile
+                new_comment.save()
+                return redirect('faculty_files', faculty_id=faculty_id)
+            except Contributions.DoesNotExist:
+                return HttpResponse("Contribution does not exist", status=404)
     return render(request, 'faculty_file.html', {'faculty': faculty, 'files': files})

@@ -212,10 +212,14 @@ https://templatemo.com/tm-569-edu-meeting
               </div>
               <div class="feedback-box">
                 <h4>Feedback</h4>
+                <form action="" method="POST">
+                  {% csrf_token %}
                 <div class="feedback-form">
-                  <textarea placeholder="Leave your feedback..."></textarea>
+                  <input type="hidden" name="contribution_id" value="{{ file.contribution.id }}">
+                  <textarea name = "comment" placeholder="Leave your feedback..."></textarea>
                   <button>Submit Feedback</button>
                 </div>
+              </form>
               </div>
             </div>
             {% endfor %} {% else %}

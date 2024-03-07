@@ -36,6 +36,15 @@ class Faculties(models.Model):
     
     def __str__(self):
         return self.name
+    
+class AcademicYear(models.Model):
+    faculties = models.ForeignKey(Faculties,on_delete=models.CASCADE)
+    closure = models.DateTimeField()
+    finalClosure = models.DateTimeField()
+
+    def __str__(self):
+        closure_date = self.closure.strftime('%Y-%m-%d')
+        return f'Closure Date: {closure_date}'
 
 class Contributions(models.Model):
     user = models.ManyToManyField(UserProfile)
@@ -55,3 +64,13 @@ class ContributionFiles(models.Model):
     
     def __str__(self):
         return self.contribution.title if self.contribution else 'No Contribution'
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(UserProfile,on_delete = models.CASCADE)
+    contribution = models.ForeignKey(Contributions,on_delete = models.CASCADE)
+    comment = models.TextField(blank=True,null=True)
+    createAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__ (self):
+        return f"{self.user.user.username} comment on {self.contribution}"
