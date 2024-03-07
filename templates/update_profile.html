@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Profile</title>
+</head>
+<body>
+    <h2>Update Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" name="fullname" value="{{ user_profile.fullname }}"><br><br>
+
+        <label for="email">Email (optional):</label>
+        <input type="email" id="email" name="email" value="{{ user_profile.email }}"><br><br>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" value="{{ user_profile.phone }}"><br><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>
+

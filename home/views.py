@@ -207,3 +207,17 @@ def download_selected_contributions(request):
     response['Content-Disposition'] = 'attachment; filename="selected_contributions.zip"'
 
     return response
+
+
+def update_profile(request):
+    user_profile = get_object_or_404(UserProfile, user=request.user.userprofile)
+    if request.method == 'POST':
+        # Update user profile information from the form
+        user_profile.fullname = request.POST.get('fullname', '')
+        user_profile.email = request.POST.get('email', '')
+        user_profile.phone = request.POST.get('phone', '')
+        user_profile.save()
+        return redirect('home')
+    else:
+        # Pass existing user profile information to the template
+        return render(request, 'update_profile.html', {'user_profile': user_profile})
