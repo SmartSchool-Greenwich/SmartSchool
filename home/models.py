@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Role(models.Model):
     name = models.CharField(max_length=30)
     
@@ -9,13 +10,16 @@ class Role(models.Model):
 
     @classmethod
     def create_default_role(cls):
-        default_role, created = cls.objects.get_or_create(name='user')
+        default_role, created = cls.objects.get_or_create(name='student')
         return default_role
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     fullname = models.CharField(max_length=50)
     roles = models.ManyToManyField(Role, related_name='users')
+    
+    faculty = models.ForeignKey('Faculties', on_delete=models.CASCADE, null=True, blank=True)
+    
     email = models.EmailField(max_length=254, unique=True, blank=True, null=True)
     phone = models.CharField(max_length=15)
     
@@ -74,3 +78,4 @@ class Comment(models.Model):
 
     def __str__ (self):
         return f"{self.user.user.username} comment on {self.contribution}"
+

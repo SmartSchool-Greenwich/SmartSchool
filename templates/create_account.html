@@ -85,9 +85,32 @@
                     <option value="{{ role.pk }}">{{ role.name }}</option>
                 {% endfor %}
             </select>
+
+            <label for="id_faculty" style="display: none;">Faculty:</label>
+            <select name="faculty" id="id_faculty" style="display: none;">
+                {% for faculty in faculties %}
+                    <option value="{{ faculty.pk }}">{{ faculty.name }}</option>
+                {% endfor %}
+            </select>
+
             
             <input type="submit" value="Register">
         </form>
     </div>
 </body>
 </html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#id_role').change(function() {
+        var selectedRole = $(this).find('option:selected').text();
+        if (selectedRole === 'marketing coordinator') {
+            $('label[for="id_faculty"]').show();
+            $('#id_faculty').show();
+        } else {
+            $('label[for="id_faculty"]').hide();
+            $('#id_faculty').hide();
+        }
+    });
+});
+</script>

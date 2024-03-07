@@ -14,5 +14,5 @@ urlpatterns = [
     path('show-contributions/', views.show_contributions, name='show_contributions'),
     path('download/contributions/', views.download_selected_contributions, name='download_selected_contributions'),
     path('update_profile/', views.update_profile, name='update_profile'),
-
+    
 ]

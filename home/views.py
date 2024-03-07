@@ -114,35 +114,44 @@ def file_upload_view(request):
 def upload_success(request):
     return render(request, 'upload_success.html')
 
-
 def create_account(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         confirm_password = request.POST['confirm_password']
         fullname = request.POST['fullname']
-        phone = request.POST.get('phone', '')  # Giá trị mặc định là chuỗi rỗng nếu không có
+        phone = request.POST.get('phone', '')
         role_id = request.POST['role']
+        faculty_id = request.POST.get('faculty', None)  # Lấy faculty nếu có
 
         if password == confirm_password:
             # Tạo user mới
             user = User.objects.create_user(username=username, password=password)
-            
-            # Tạo UserProfile mới và lưu ngay lập tức
+
+            # Tạo UserProfile mới
             new_profile = UserProfile(user=user, fullname=fullname, phone=phone)
-            new_profile.save()  # Lưu UserProfile để có thể thêm vào role
+
+            # Kiểm tra và thêm faculty nếu role tương ứng và faculty_id được cung cấp
+            if faculty_id:
+                try:
+                    faculty = Faculties.objects.get(id=faculty_id)
+                    new_profile.faculty = faculty
+                except Faculties.DoesNotExist:
+                    # Xử lý trường hợp không tìm thấy faculty
+                    pass  # Hoặc bạn có thể thêm logic xử lý lỗi ở đây
+
+            # Lưu UserProfile
+            new_profile.save()
 
             # Thêm role vào UserProfile
-            selected_role = Role.objects.get(id=role_id)  # Lấy role từ ID
-            new_profile.roles.add(selected_role)  # Không cần gọi save() sau khi thêm role
+            selected_role = Role.objects.get(id=role_id)
+            new_profile.roles.add(selected_role)
 
-            return redirect('login')  # Redirect to a login page after successful registration
-        else:
-            # Thêm logic xử lý lỗi nếu mật khẩu không khớp hoặc thông tin không đầy đủ
-            pass  
-
-    roles = Role.objects.all()  # Lấy tất cả roles cho dropdown
-    return render(request, 'create_account.html', {'roles': roles})
+            return redirect('login')
+    else:  # GET request
+        roles = Role.objects.all()
+        faculties = Faculties.objects.all()  # Giả sử bạn muốn hiển thị tất cả faculties trong form
+        return render(request, 'create_account.html', {'roles': roles, 'faculties': faculties})
 
 
 def create_faculty(request):
