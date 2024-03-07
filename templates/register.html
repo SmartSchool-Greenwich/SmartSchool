@@ -147,6 +147,15 @@
                             <input type="password" name="repassword" required>
                             <label for="">Confirm Password</label>
                         </div>
+                        <div style="margin-bottom: 25px">
+                            <label for="id_faculty">Faculty</label>
+                              <select name="faculty" id="id_faculty" required>
+                              <option value="" >--Please choose an option--</option>
+                                  {% for faculty in faculties %}
+                              <option value="{{ faculty.id }}" >{{ faculty.name }} </option>
+                                  {% endfor %}
+                              </select>
+                        </div>
                     </div>
                     <button type="submit">Register</button>
                     <div class="register">

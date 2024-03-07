@@ -33,29 +33,32 @@ def login_view(request):
     return render(request, 'login.html')
 
 def register_view(request):
+    faculties = Faculties.objects.all()
+
     if request.method == 'POST':
-        if request.POST['username'] and request.POST['fullname'] and request.POST['phone'] and request.POST['password'] and request.POST['repassword']:
-            username =  request.POST['username']
-            email = request.POST.get('email')
-            fullname = request.POST.get('fullname')
-            phone = request.POST.get('phone')
-            password = request.POST.get('password')
-            repassword = request.POST.get('repassword')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        fullname = request.POST.get('fullname')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        repassword = request.POST.get('repassword')
+        faculty_id = request.POST.get('faculty', None)
 
-        if password == repassword:
-            if User.objects.filter(username = username).exists():
-                return redirect('register')
+        if all([username, fullname, phone, password, repassword]):
+            if password == repassword:
+                if User.objects.filter(username=username).exists():
+                    return redirect('register')
+                else:
+                    user = User.objects.create_user(username=username, password=password, email=email)
+                    faculty = Faculties.objects.get(id=faculty_id) if faculty_id else None
+                    
+                    userprofile = UserProfile(user=user, fullname=fullname, email=email, phone=phone, faculty=faculty)
+                    userprofile.save()
+                    return redirect('login')
             else:
-                user = User.objects.create_user(username=username,password=password,email=email)   
-                user.save()
-                
-                userprofile = UserProfile(user=user, fullname=fullname, email=email, phone=phone)
-                userprofile.save()
-                return redirect('login')
-        else:
-            return redirect('register') 
-
-    return render(request, 'register.html')
+                return redirect('register')
+        
+    return render(request, 'register.html', {'faculties': faculties})
 
 def logout_view(request):
     logout(request)
