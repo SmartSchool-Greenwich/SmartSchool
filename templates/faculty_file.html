@@ -67,7 +67,7 @@ https://templatemo.com/tm-569-edu-meeting
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin: 10px;
         box-sizing: border-box;
-        padding: 20px;
+        padding: 30px;
         width: 100%;
       }
 
@@ -80,10 +80,17 @@ https://templatemo.com/tm-569-edu-meeting
       .user-info img {
         border-radius: 50%;
         margin-right: 10px;
+        width: 100px;
+        height: 100px;
       }
 
       .user-details {
         flex-grow: 1;
+        margin: 20px;
+      }
+
+      .user-content {
+        margin: 20px 0;
       }
 
       .feedback-box {
@@ -192,24 +199,27 @@ https://templatemo.com/tm-569-edu-meeting
             <div class="contribution-container">
               <div class="user-info">
                 <img
-                  src="user-avatar1.jpg"
+                  src=""
                   alt="User Avatar 1"
                   width="40"
                   height="40"
                 />
                 <div class="user-details">
-                  <h3>User Name 1</h3>
-                  <p>Post Date: March 6, 2024</p>
+                  <h4>User Name 1</h4>
+                  <h6>Post Date: March 6, 2024</h6>
                 </div>
               </div>
               <div class="user-content">
+                {% if file.word %}
                 <li>
-                  {% if file.word %} Document:
-                  <a href="{{ file.word.url }}">{{ file.word.name }}</a> 
-                  {% elif file.image %} Image:
-                  <a href="{{ file.img.url }}">{{ file.img.name }}</a>
-                  {% endif %}
+                  <h6>Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h6>
                 </li>
+                {% endif %}
+                {% if file.img %} 
+                <li>
+                  <h6>Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h6>
+                </li>
+                {% endif %}
               </div>
               <div class="feedback-box">
                 <h4>Feedback</h4>

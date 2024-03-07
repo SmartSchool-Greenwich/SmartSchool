@@ -43,7 +43,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
+      max-width: 700px;
       margin: auto;
     }
 
@@ -69,7 +69,7 @@
     }
 
     input[type="checkbox"] {
-      margin-top: 15px;
+      margin-top: 0px;
     }
 
     input[type="submit"] {
@@ -213,13 +213,13 @@
             <label for="id_img">Image (optional):</label>
             <input type="file" name="img" id="id_img" accept="image/*" />
 
-            <label for="id_term" name="term">Term:</label>
-            <input
+            <label for="id_term" name="term"><input
               type="checkbox"
               name="term"
               id="id_term"
               onclick="toggleUploadButton()"
-            />
+            /> I completely agree with the terms and policies.</label>
+            
 
             <input type="submit" value="Upload" id="uploadButton" />
           </form>
