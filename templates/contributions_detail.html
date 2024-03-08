@@ -1,26 +1,338 @@
-<h2>{{ contribution.title }}</h2>
-<p>{{ contribution.content }}</p>
-<!-- Hiển thị và quản lý files -->
-{% for file in contribution.files.all %}
-    <div>{{ file.word.url }} {{ file.img.url }}</div>
-    <!-- Thêm form/button để xóa file ở đây -->
-{% endfor %}
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="TemplateMo" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
 
-<!-- Form để thêm file mới -->
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ file_form.as_p }}
-    <button type="submit" name="add_file">Add File</button>
-</form>
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900"
+      rel="stylesheet"
+    />
 
-<!-- Hiển thị comments -->
-{% for comment in comments %}
-    <p><strong>{{ comment.user.fullname }}:</strong> {{ comment.comment }}</p>
-{% endfor %}
+    <!-- Bootstrap core CSS -->
+    <link
+      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
 
-<!-- Form để thêm comment mới -->
-<form method="post">
-    {% csrf_token %}
-    {{ comment_form.as_p }}
-    <button type="submit" name="add_comment">Add Comment</button>
-</form>
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/templatemo-edu-meeting.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/owl.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+      }
+
+      .header-content {
+        margin: 30px;
+        padding: 10px auto;
+      }
+
+      .header-content h2 {
+        text-align: center;
+        color: #fff;
+      }
+
+      .file-crud-container {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        box-sizing: border-box;
+        padding: 30px;
+        width: 100%;
+      }
+
+      .file-crud-container h2 {
+        text-align: center;
+      }
+
+      .file-upload-form {
+        margin-bottom: 20px;
+      }
+
+      .truncated {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 800px;
+      }
+
+      .content {
+        display: flex;
+        margin: 10px 0;
+      }
+
+      .content a {
+        margin: 0 5px;
+      }
+
+      .file-upload-form button {
+        justify-content: center;
+      }
+
+      .navigation-container {
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        box-sizing: border-box;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .navigation-options {
+        /* Add styling for navigation options */
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="main-nav">
+              <!-- ***** Logo Start ***** -->
+              <a href="index.html" class="logo"> Edu Meeting </a>
+              <!-- ***** Logo End ***** -->
+              <!-- ***** Menu Start ***** -->
+              <ul class="nav">
+                <li>
+                  <a href="{% url 'home' %}" class="active">Home</a>
+                </li>
+                <li><a href="meetings.html">Meetings</a></li>
+                <li class="scroll-to-section">
+                  <a href="#apply">Apply Now</a>
+                </li>
+                <li class="has-sub">
+                  <a href="javascript:void(0)">Pages</a>
+                  <ul class="sub-menu">
+                    {%for f in faculties%}
+                    <li>
+                      <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                    </li>
+                    {%endfor%}
+                  </ul>
+                </li>
+                <li><a href="{% url 'file_upload'%}">Upload file</a></li>
+                {% if user.is_authenticated %}
+                <!-- Display the form or user-specific content -->
+                <li><a href="#courses">hello {{request.user.username}}</a></li>
+                <li><a href="{% url 'logout'%}">Logout</a></li>
+
+                {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+              </ul>
+              <a class="menu-trigger">
+                <span>Menu</span>
+              </a>
+              <!-- ***** Menu End ***** -->
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <section class="apply-now" id="apply">
+      <div class="header-content">
+        <h2>Contribution Details</h2>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <!-- Contribution Container -->
+          <div class="col-md-8 mx-auto">
+            <div class="container">
+              <div class="file-crud-container">
+                <h2>{{ contribution.title }}</h2>
+                <p>Content: {{ contribution.content }}</p>
+                <p>
+                  <!-- File Upload Form -->
+                </p>
+
+                <form class="file-upload-form" enctype="multipart/form-data">
+                  {% for file in contribution.files.all %}
+                  <div class="form-group">
+                    {% if file.word %}
+                    <div class="content">
+                      <h5 class="truncated">Document: {{ file.word }}</h5>
+                      <a href=""><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                    {% else %}
+                    <input
+                      type="file"
+                      class="form-control-file"
+                      id="fileInput"
+                      name="fileInput"
+                      accept="image/*"
+                    />
+                    {% endif %} {% if file.img %}
+                    <div class="content">
+                      <h5 class="truncated">Image: {{ file.img }}</h5>
+                      <a href=""><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                    {% else %}
+                    <input
+                      type="file"
+                      class="form-control-file"
+                      id="fileInput"
+                      name="fileInput"
+                      accept="image/*"
+                    />
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+
+                  <button type="submit" class="btn btn-danger">
+                    Delete contribution
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Container -->
+          <div class="col-md-4 mx-auto">
+            <div class="navigation-container">
+              <div class="navigation-options">
+                <!-- Add your navigation options here -->
+                <h4>Contribution feedbacks</h4>
+                {% for comment in comments %}
+                <p>
+                  <strong>{{ comment.user.fullname }}:</strong>
+                  {{comment.comment }}
+                </p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-us" id="contact">
+      <div class="footer">
+        <p>
+          Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
+          <br />
+          Design:
+          <a
+            href="https://templatemo.com"
+            target="_parent"
+            title="free css templates"
+            >TemplateMo</a
+          >
+          <br />
+          Distibuted By:
+          <a
+            href="https://themewagon.com"
+            target="_blank"
+            title="Build Better UI, Faster"
+            >ThemeWagon</a
+          >
+        </p>
+      </div>
+    </section>
+
+    <!-- Font Awesome (delete icon) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    <!-- Bootstrap JS and Popper.js are required for Bootstrap functionality -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Scripts -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="{%static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{%static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <script src="{%static 'js/isotope.min.js' %}"></script>
+    <script src="{%static 'js/owl-carousel.js' %}"></script>
+    <script src="{%static 'js/lightbox.js' %}"></script>
+    <script src="{%static 'js/tabs.js' %}"></script>
+    <script src="{%static 'js/video.js' %}"></script>
+    <script src="{%static 'js/slick-slider.js' %}"></script>
+    <script src="{%static 'js/custom.js' %}"></script>
+    <script>
+      //according to loftblog tut
+      $(".nav li:first").addClass("active");
+
+      var showSection = function showSection(section, isAnimate) {
+        var direction = section.replace(/#/, ""),
+          reqSection = $(".section").filter(
+            '[data-section="' + direction + '"]'
+          ),
+          reqSectionPos = reqSection.offset().top - 0;
+
+        if (isAnimate) {
+          $("body, html").animate(
+            {
+              scrollTop: reqSectionPos,
+            },
+            800
+          );
+        } else {
+          $("body, html").scrollTop(reqSectionPos);
+        }
+      };
+
+      var checkSection = function checkSection() {
+        $(".section").each(function () {
+          var $this = $(this),
+            topEdge = $this.offset().top - 80,
+            bottomEdge = topEdge + $this.height(),
+            wScroll = $(window).scrollTop();
+          if (topEdge < wScroll && bottomEdge > wScroll) {
+            var currentId = $this.data("section"),
+              reqLink = $("a").filter("[href*=\\#" + currentId + "]");
+            reqLink
+              .closest("li")
+              .addClass("active")
+              .siblings()
+              .removeClass("active");
+          }
+        });
+      };
+
+      $(".main-menu, .responsive-menu, .scroll-to-section").on(
+        "click",
+        "a",
+        function (e) {
+          e.preventDefault();
+          showSection($(this).attr("href"), true);
+        }
+      );
+
+      $(window).scroll(function () {
+        checkSection();
+      });
+    </script>
+  </body>
+</html>
