@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Faculties</title>
+</head>
+<body>
+    <h1>Faculties</h1>
+    <a href="{% url 'create_faculty' %}">Create New Faculty</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Academic Year</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faculty in faculties %}
+            <tr>
+                <td>{{ faculty.name }}</td>
+                <td>{{ faculty.description }}</td>
+                <td>{{ faculty.academicYear.closure|date:"Y-m-d" }} - {{ faculty.academicYear.finalClosure|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'update_faculty' faculty.id %}">Update</a>
+                    <form action="{% url 'remove_faculty' faculty.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="submit" value="Remove">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

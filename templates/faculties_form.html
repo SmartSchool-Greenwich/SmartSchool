@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Faculty</title>
+</head>
+<body>
+    <h1>Update Faculty</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="name">Faculty Name:</label>
+            <input type="text" id="name" name="name" value="{{ faculty.name }}" required><br><br>
+        </div>
+        
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required>{{ faculty.description }}</textarea><br><br>
+        </div>
+        
+        <div>
+            <label for="academicYear">Academic Year:</label>
+            <select id="academicYear" name="academicYear" required>
+                {% for year in academic_years %}
+                    <option value="{{ year.id }}" {% if faculty.academicYear.id == year.id %}selected{% endif %}>
+                        {{ year.closure|date:"Y" }} to {{ year.finalClosure|date:"Y" }}
+                    </option>
+                {% endfor %}
+            </select><br><br>
+        </div>
+        
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

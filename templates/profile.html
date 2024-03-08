@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+    <h1>User Profile</h1>
+    <p>Full Name: {{ user_profile.fullname }}</p>
+    <p>Email: {{ user_profile.email }}</p>
+    <p>Phone: {{ user_profile.phone }}</p>
+    <!-- Add more fields as necessary -->
+
+    <a href="{% url 'update_profile' %}">Update Information</a>
+</body>
+</html>

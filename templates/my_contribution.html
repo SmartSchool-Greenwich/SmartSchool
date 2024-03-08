@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Contributions</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Contributions</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contribution in contributions %}
+            <tr>
+                <td>{{ contribution.title }}</td>
+                <td>{{ contribution.content|default:"No description provided" }}</td>
+                <td>{{ contribution.createAt|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="">Update</a> | 
+                    <a href="" onclick="return confirm('Are you sure?');">Remove</a> | 
+                    <a href="">View Detail</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No contributions found.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

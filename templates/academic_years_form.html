@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Academic Year</title>
+</head>
+<body>
+    <h1>Update Academic Year</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="closure">Closure Date:</label>
+            <input type="datetime-local" id="closure" name="closure" value="{{ academic_year.closure|date:'Y-m-d\TH:i' }}" required>
+        </div>
+        <br>
+        <div>
+            <label for="finalClosure">Final Closure Date:</label>
+            <input type="datetime-local" id="finalClosure" name="finalClosure" value="{{ academic_year.finalClosure|date:'Y-m-d\TH:i' }}" required>
+        </div>
+        <br>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

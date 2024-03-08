@@ -82,7 +82,7 @@ https://templatemo.com/tm-569-edu-meeting
               <li ><a href="{% url 'file_upload'%}">Upload file</a></li>
               {% if user.is_authenticated %}
               <!-- Display the form or user-specific content -->
-              <li ><a href="{%url 'update_profile' %}">hello {{request.user.username}}</a></li>
+              <li ><a href="{%url 'profile' %}">hello {{request.user.username}}</a></li>
               <li><a href="{% url 'logout'%}">Logout</a></li>
 
               {% else %}

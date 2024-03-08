@@ -33,16 +33,7 @@ class UserProfile(models.Model):
             default_role = Role.create_default_role()
             self.roles.add(default_role)
 
-
-
-class Faculties(models.Model):
-    name = models.CharField(max_length = 40)
-    
-    def __str__(self):
-        return self.name
-    
 class AcademicYear(models.Model):
-    faculties = models.ForeignKey(Faculties,on_delete=models.CASCADE)
     closure = models.DateTimeField()
     finalClosure = models.DateTimeField()
 
@@ -50,9 +41,19 @@ class AcademicYear(models.Model):
         closure_date = self.closure.strftime('%Y-%m-%d')
         return f'Closure Date: {closure_date}'
 
+class Faculties(models.Model):
+    name = models.CharField(max_length = 40)
+    description = models.TextField(null =True)
+    academicYear = models.ForeignKey(AcademicYear, on_delete = models.CASCADE)
+    def __str__(self):
+        return self.name
+    
+
+
 class Contributions(models.Model):
     user = models.ManyToManyField(UserProfile)
     title = models.CharField(max_length=30)
+    status = models.BooleanField(default = False)
     content = models.TextField(null = True)
     faculty = models.ForeignKey(Faculties,on_delete=models.CASCADE)
     term = models.BooleanField(default=False)

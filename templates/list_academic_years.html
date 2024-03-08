@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Academic Years</title>
+</head>
+<body>
+    <h1>Academic Years</h1>
+    <a href="{% url 'create_academic_year' %}">Create New Academic Year</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Closure Date</th>
+                <th>Final Closure Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year in academic_years %}
+            <tr>
+                <td>{{ year.closure|date:"Y-m-d" }}</td>
+                <td>{{ year.finalClosure|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'update_academic_year' year.id %}">Update</a>
+                    <form action="{% url 'remove_academic_year' year.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="submit" value="Remove">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

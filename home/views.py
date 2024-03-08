@@ -158,18 +158,7 @@ def create_account(request):
         return render(request, 'create_account.html', {'roles': roles, 'faculties': faculties})
 
 
-def create_faculty(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        closure = parse_datetime(request.POST.get('closure'))
-        finalClosure = parse_datetime(request.POST.get('finalClosure'))
 
-        if name and closure and finalClosure:
-            faculty = Faculties.objects.create(name=name)
-            AcademicYear.objects.create(faculties=faculty, closure=closure, finalClosure=finalClosure)
-            return redirect('home') 
-         # Điều hướng đến URL danh sách Faculties sau khi tạo
-    return render(request, 'faculty_create.html')
 
 def faculty_files(request, faculty_id):
     faculty = get_object_or_404(Faculties, pk=faculty_id)
@@ -269,3 +258,105 @@ def contributions_detail(request, contribution_id):
         'comment_form': comment_form,
         'file_form': file_form
     })    
+
+
+
+def my_contributions(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    contributions = Contributions.objects.filter(user=user_profile).prefetch_related('faculty', 'files')
+    return render(request, 'my_contribution.html', {'contributions': contributions})
+
+
+
+def list_faculties(request):
+    faculties = Faculties.objects.all()
+    return render(request, 'list_faculties.html', {'faculties': faculties})
+
+
+def remove_faculty(request, faculty_id):
+    faculty = get_object_or_404(Faculties, pk=faculty_id)
+    faculty.delete()
+    return redirect('list_faculties')
+
+
+
+
+    
+
+@login_required
+def user_profile(request):
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    return render(request, 'profile.html', {'user_profile': user_profile})
+
+
+
+
+
+#academic
+def list_academic_years(request):
+    academic_years = AcademicYear.objects.all()
+    return render(request, 'list_academic_years.html', {'academic_years': academic_years})
+
+
+def create_academic_year(request):
+    if request.method == "POST":
+        closure = request.POST.get('closure')
+        finalClosure = request.POST.get('finalClosure')
+        AcademicYear.objects.create(closure=closure, finalClosure=finalClosure)
+        return redirect('list_academic_years')
+    return render(request, 'academic_years_form.html')
+
+
+def update_academic_year(request, year_id):
+    academic_year = get_object_or_404(AcademicYear, pk=year_id)
+    if request.method == "POST":
+        academic_year.closure = request.POST.get('closure')
+        academic_year.finalClosure = request.POST.get('finalClosure')
+        academic_year.save()
+        return redirect('list_academic_years')
+    return render(request, 'academic_years_form.html', {'academic_year': academic_year})
+
+
+def remove_academic_year(request, year_id):
+    academic_year = get_object_or_404(AcademicYear, pk=year_id)
+    academic_year.delete()
+    return redirect('list_academic_years')
+
+
+
+
+#faculty
+def list_faculties(request):
+    faculties = Faculties.objects.all().select_related('academicYear')
+    return render(request, 'list_faculties.html', {'faculties': faculties})
+
+
+def create_faculty(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        academicYear_id = request.POST.get('academicYear')
+        academicYear = AcademicYear.objects.get(id=academicYear_id)
+        Faculties.objects.create(name=name, description=description, academicYear=academicYear)
+        return redirect('list_faculties')
+    academic_years = AcademicYear.objects.all()
+    return render(request, 'faculties_form.html', {'academic_years': academic_years})
+
+
+def update_faculty(request, faculty_id):
+    faculty = get_object_or_404(Faculties, pk=faculty_id)
+    if request.method == "POST":
+        faculty.name = request.POST.get('name')
+        faculty.description = request.POST.get('description')
+        academicYear_id = request.POST.get('academicYear')
+        faculty.academicYear = AcademicYear.objects.get(id=academicYear_id)
+        faculty.save()
+        return redirect('list_faculties')
+    academic_years = AcademicYear.objects.all()
+    return render(request, 'faculties_form.html', {'faculty': faculty, 'academic_years': academic_years})
+
+
+def remove_faculty(request, faculty_id):
+    faculty = get_object_or_404(Faculties, pk=faculty_id)
+    faculty.delete()
+    return redirect('list_faculties')
