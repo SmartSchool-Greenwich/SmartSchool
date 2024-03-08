@@ -1,0 +1,26 @@
+<h2>{{ contribution.title }}</h2>
+<p>{{ contribution.content }}</p>
+<!-- Hiển thị và quản lý files -->
+{% for file in contribution.files.all %}
+    <div>{{ file.word.url }} {{ file.img.url }}</div>
+    <!-- Thêm form/button để xóa file ở đây -->
+{% endfor %}
+
+<!-- Form để thêm file mới -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ file_form.as_p }}
+    <button type="submit" name="add_file">Add File</button>
+</form>
+
+<!-- Hiển thị comments -->
+{% for comment in comments %}
+    <p><strong>{{ comment.user.fullname }}:</strong> {{ comment.comment }}</p>
+{% endfor %}
+
+<!-- Form để thêm comment mới -->
+<form method="post">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit" name="add_comment">Add Comment</button>
+</form>

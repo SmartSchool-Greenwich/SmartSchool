@@ -2,10 +2,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role,AcademicYear
+from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role,AcademicYear, Comment
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_datetime
-from .forms import CommentForm
+from .forms import CommentForm, FileForm
+from django.urls import reverse
 import zipfile
 from io import BytesIO
 
@@ -233,3 +234,38 @@ def update_profile(request):
     else:
         # Pass existing user profile information to the template
         return render(request, 'update_profile.html', {'user_profile': user_profile})
+
+def contributions_detail(request, contribution_id):
+    contribution = get_object_or_404(Contributions, id=contribution_id)
+    comments = Comment.objects.filter(contribution=contribution)
+
+    if request.method == "POST":
+        # Xử lý thêm comment
+        if 'comment' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.contribution = contribution
+                # Giả sử UserProfile được liên kết với User qua một trường `user`
+                new_comment.user = request.user.userprofile
+                new_comment.save()
+                return HttpResponseRedirect(reverse('contribution_detail', args=[contribution_id]))
+
+        # Xử lý upload file mới
+        elif request.FILES:
+            file_form = FileForm(request.POST, request.FILES)
+            if file_form.is_valid():
+                new_file = file_form.save(commit=False)
+                new_file.contribution = contribution
+                new_file.save()
+                return HttpResponseRedirect(reverse('contribution_detail', args=[contribution_id]))
+    else:
+        comment_form = CommentForm()
+        file_form = FileForm()
+
+    return render(request, 'contributions_detail.html', {
+        'contribution': contribution,
+        'comments': comments,
+        'comment_form': comment_form,
+        'file_form': file_form
+    })    
