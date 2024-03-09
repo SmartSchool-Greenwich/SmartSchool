@@ -9,6 +9,7 @@ from .forms import CommentForm, FileForm
 from django.urls import reverse
 import zipfile
 from io import BytesIO
+from django.utils import timezone
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -67,13 +68,23 @@ def logout_view(request):
 
 def home(request):
     faculties = Faculties.objects.all()
-    context = { 
-        'faculties':faculties
+    can_upload = False 
+    
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            faculty = user_profile.faculty
+            academic_year = faculty.academicYear if faculty else None
+            if academic_year and timezone.now() < academic_year.closure:
+                can_upload = True
+        except UserProfile.DoesNotExist:
+            can_upload = False
+    
+    context = {
+        'faculties': faculties,
+        'can_upload': can_upload,
     }
     return render(request, 'home.html', context)
-
-
-
 
 def file_upload_view(request):
     faculties = Faculties.objects.all()
@@ -93,8 +104,7 @@ def file_upload_view(request):
             )
             contribution.user.add(request.user.userprofile)
             
-            # Vòng lặp xử lý mỗi file được upload
-            contribution_file = ContributionFiles(contribution=contribution)  # Tạo đối tượng mới cho mỗi file
+            contribution_file = ContributionFiles(contribution=contribution)  
             for file in request.FILES.getlist('word') + request.FILES.getlist('img'):
                 if file.name.endswith('.doc') or file.name.endswith('.docx'):
                     contribution_file.word = file
@@ -106,13 +116,53 @@ def file_upload_view(request):
         except Faculties.DoesNotExist:
             return redirect('home')
         except Exception as e:
-            print(e)  # Ghi rõ lỗi ra để dễ dàng gỡ rối
+            print(e) 
             return redirect('home')
     
     else:
         context = {'faculties': faculties}
         
     return render(request, 'upload.html', context)
+
+def update_contribution(request, pk):
+    contribution = get_object_or_404(Contributions, pk=pk)
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        term = request.POST.get('term') == 'on'
+        contribution.title = title
+        contribution.content = content
+        contribution.term = term
+        contribution.save()
+
+        word_file = request.FILES.get('word', None)
+        img_file = request.FILES.get('img', None)
+        if word_file or img_file:
+            contribution_files, created = ContributionFiles.objects.get_or_create(contribution=contribution)
+            if word_file:
+                contribution_files.word = word_file
+            if img_file:
+                contribution_files.img = img_file
+            contribution_files.save()
+
+        return redirect('my_contributions')  
+
+    contribution_files = ContributionFiles.objects.filter(contribution=contribution).first()
+    context = {
+        'contribution': contribution,
+        'contribution_files': contribution_files,
+    }
+    return render(request, 'update_contribution.html', context)
+
+@login_required
+def delete_contribution(request, pk):
+    contribution = get_object_or_404(Contributions, pk=pk)
+    if request.method == 'GET': 
+        contribution.delete()
+        return redirect('my_contributions')
+    else:
+        return HttpResponse('Method not allowed', status=405) 
 
 
 def upload_success(request):
@@ -126,35 +176,29 @@ def create_account(request):
         fullname = request.POST['fullname']
         phone = request.POST.get('phone', '')
         role_id = request.POST['role']
-        faculty_id = request.POST.get('faculty', None)  # Lấy faculty nếu có
+        faculty_id = request.POST.get('faculty', None) 
 
         if password == confirm_password:
-            # Tạo user mới
             user = User.objects.create_user(username=username, password=password)
 
-            # Tạo UserProfile mới
             new_profile = UserProfile(user=user, fullname=fullname, phone=phone)
 
-            # Kiểm tra và thêm faculty nếu role tương ứng và faculty_id được cung cấp
             if faculty_id:
                 try:
                     faculty = Faculties.objects.get(id=faculty_id)
                     new_profile.faculty = faculty
                 except Faculties.DoesNotExist:
-                    # Xử lý trường hợp không tìm thấy faculty
-                    pass  # Hoặc bạn có thể thêm logic xử lý lỗi ở đây
+                    pass  
 
-            # Lưu UserProfile
             new_profile.save()
 
-            # Thêm role vào UserProfile
             selected_role = Role.objects.get(id=role_id)
             new_profile.roles.add(selected_role)
 
             return redirect('login')
-    else:  # GET request
+    else: 
         roles = Role.objects.all()
-        faculties = Faculties.objects.all()  # Giả sử bạn muốn hiển thị tất cả faculties trong form
+        faculties = Faculties.objects.all() 
         return render(request, 'create_account.html', {'roles': roles, 'faculties': faculties})
 
 
@@ -173,7 +217,7 @@ def faculty_files(request, faculty_id):
                 contribution = Contributions.objects.get(id=contribution_id)
                 new_comment = comment_form.save(commit=False)
                 new_comment.contribution = contribution
-            # Sử dụng UserProfile thay vì User
+
                 user_profile, created = UserProfile.objects.get_or_create(user=request.user)
                 new_comment.user = user_profile
                 new_comment.save()
@@ -183,14 +227,11 @@ def faculty_files(request, faculty_id):
     return render(request, 'faculty_file.html', {'faculty': faculty, 'files': files})
 
 def show_contributions(request):
-    # Lấy tất cả contributions từ database
     contributions = Contributions.objects.all()
     
-    # Render template, truyền 'contributions' vào context để có thể sử dụng trong template
     return render(request, 'show_contribution.html', {'contributions': contributions})
 
 
-#download file zip
 def download_selected_contributions(request):
     contribution_ids = request.POST.getlist('contribution_ids')
     files = ContributionFiles.objects.filter(contribution__id__in=contribution_ids)
@@ -214,33 +255,39 @@ def download_selected_contributions(request):
 def update_profile(request):
     user_profile = get_object_or_404(UserProfile, user=request.user.userprofile)
     if request.method == 'POST':
-        # Update user profile information from the form
         user_profile.fullname = request.POST.get('fullname', '')
         user_profile.email = request.POST.get('email', '')
         user_profile.phone = request.POST.get('phone', '')
         user_profile.save()
         return redirect('home')
     else:
-        # Pass existing user profile information to the template
         return render(request, 'update_profile.html', {'user_profile': user_profile})
 
 def contributions_detail(request, contribution_id):
     contribution = get_object_or_404(Contributions, id=contribution_id)
     comments = Comment.objects.filter(contribution=contribution)
+    can_update = False 
+    
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            faculty = user_profile.faculty
+            academic_year = faculty.academicYear if faculty else None
+            if academic_year and timezone.now() < academic_year.finalClosure:
+                can_update = True
+        except UserProfile.DoesNotExist:
+            can_update = False 
 
     if request.method == "POST":
-        # Xử lý thêm comment
         if 'comment' in request.POST:
             comment_form = CommentForm(request.POST)
             if comment_form.is_valid():
                 new_comment = comment_form.save(commit=False)
                 new_comment.contribution = contribution
-                # Giả sử UserProfile được liên kết với User qua một trường `user`
                 new_comment.user = request.user.userprofile
                 new_comment.save()
                 return HttpResponseRedirect(reverse('contribution_detail', args=[contribution_id]))
 
-        # Xử lý upload file mới
         elif request.FILES:
             file_form = FileForm(request.POST, request.FILES)
             if file_form.is_valid():
@@ -256,7 +303,8 @@ def contributions_detail(request, contribution_id):
         'contribution': contribution,
         'comments': comments,
         'comment_form': comment_form,
-        'file_form': file_form
+        'file_form': file_form,
+        'can_update': can_update,
     })    
 
 
@@ -264,7 +312,29 @@ def contributions_detail(request, contribution_id):
 def my_contributions(request):
     user_profile = UserProfile.objects.get(user=request.user)
     contributions = Contributions.objects.filter(user=user_profile).prefetch_related('faculty', 'files')
-    return render(request, 'my_contribution.html', {'contributions': contributions})
+    can_upload = False 
+    can_update = False 
+    
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            faculty = user_profile.faculty
+            academic_year = faculty.academicYear if faculty else None
+            if academic_year and timezone.now() < academic_year.closure:
+                can_upload = True
+            if academic_year and timezone.now() < academic_year.finalClosure:
+                can_update = True
+        except UserProfile.DoesNotExist:
+            can_upload = False
+            can_update = False 
+
+    
+    context = {
+        'can_upload': can_upload,
+        'can_update': can_update,
+        'contributions': contributions
+    }
+    return render(request, 'my_contribution.html', context)
 
 
 
@@ -299,22 +369,31 @@ def list_academic_years(request):
 
 
 def create_academic_year(request):
+    page = "create"
     if request.method == "POST":
         closure = request.POST.get('closure')
         finalClosure = request.POST.get('finalClosure')
         AcademicYear.objects.create(closure=closure, finalClosure=finalClosure)
         return redirect('list_academic_years')
-    return render(request, 'academic_years_form.html')
+    context = {
+        'page' : page,
+    }
+    return render(request, 'academic_years_form.html', context)
 
 
 def update_academic_year(request, year_id):
+    page = "update"
     academic_year = get_object_or_404(AcademicYear, pk=year_id)
     if request.method == "POST":
         academic_year.closure = request.POST.get('closure')
         academic_year.finalClosure = request.POST.get('finalClosure')
         academic_year.save()
         return redirect('list_academic_years')
-    return render(request, 'academic_years_form.html', {'academic_year': academic_year})
+    context = {
+        'page' : page,
+        'academic_year': academic_year,
+    }
+    return render(request, 'academic_years_form.html', context)
 
 
 def remove_academic_year(request, year_id):
@@ -332,6 +411,7 @@ def list_faculties(request):
 
 
 def create_faculty(request):
+    page = "create"
     if request.method == "POST":
         name = request.POST.get('name')
         description = request.POST.get('description')
@@ -340,10 +420,15 @@ def create_faculty(request):
         Faculties.objects.create(name=name, description=description, academicYear=academicYear)
         return redirect('list_faculties')
     academic_years = AcademicYear.objects.all()
-    return render(request, 'faculties_form.html', {'academic_years': academic_years})
+    context = {
+        'page' : page,
+        'academic_years': academic_years
+    }
+    return render(request, 'faculties_form.html', context)
 
 
 def update_faculty(request, faculty_id):
+    page = "update"
     faculty = get_object_or_404(Faculties, pk=faculty_id)
     if request.method == "POST":
         faculty.name = request.POST.get('name')
@@ -353,7 +438,12 @@ def update_faculty(request, faculty_id):
         faculty.save()
         return redirect('list_faculties')
     academic_years = AcademicYear.objects.all()
-    return render(request, 'faculties_form.html', {'faculty': faculty, 'academic_years': academic_years})
+    context = {
+        'page' : page,
+        'faculty': faculty, 
+        'academic_years': academic_years
+    }
+    return render(request, 'faculties_form.html', context)
 
 
 def remove_faculty(request, faculty_id):

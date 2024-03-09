@@ -186,7 +186,12 @@
     <!-- ***** Header Area End ***** -->
 
     <section class="apply-now" id="apply">
-      <h2>Update Faculty</h2>
+      {% if page == "create" %}
+        <h2>Create Faculty</h2>
+      {% else %}
+        <h2>Update Faculty</h2>
+      {% endif %}
+      
       <form action="" method="post">
         {% csrf_token %}
         <div>
@@ -212,7 +217,12 @@
         
         <div class="text-center">
             <!-- Center the button -->
-            <button type="submit" class="btn btn-primary">Update</button>
+            {% if page == "create" %}
+              <button type="submit" class="btn btn-primary">Create</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Update</button>
+            {% endif %}
+            
         </div>
       </form>
     </section>
@@ -307,15 +317,4 @@
       });
     </script>
   </body>
-</html>
-
-
-
-
-<body>
-    <h1>Update Faculty</h1>
-    <form action="" method="post">
-        
-    </form>
-</body>
 </html>

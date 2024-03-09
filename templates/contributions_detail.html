@@ -151,7 +151,6 @@
                   <a href="{% url 'file_upload'%}">Upload Contributions</a>
                 </li>
                 {% if user.is_authenticated %}
-                <!-- Display the form or user-specific content -->
                 <li >
                   <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
                 </li>
@@ -187,9 +186,8 @@
             <div class="container">
               <div class="file-crud-container">
                 <h2>{{ contribution.title }}</h2>
-                <p>Content: {{ contribution.content }}</p>
+                <h5>Content: {{ contribution.content }}</h5>
                 <p>
-                  <!-- File Upload Form -->
                 </p>
 
                 <form class="file-upload-form" enctype="multipart/form-data">
@@ -197,8 +195,8 @@
                   <div class="form-group">
                     {% if file.word %}
                     <div class="content">
-                      <h5 class="truncated">Document: {{ file.word }}</h5>
-                      <a href=""><i class="fas fa-trash-alt"></i></a>
+                      <h5 class="truncated">Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h5>
+                      {% comment %} <a href=""><i class="fas fa-trash-alt"></i></a> {% endcomment %}
                     </div>
                     {% else %}
                     <input
@@ -210,8 +208,7 @@
                     />
                     {% endif %} {% if file.img %}
                     <div class="content">
-                      <h5 class="truncated">Image: {{ file.img }}</h5>
-                      <a href=""><i class="fas fa-trash-alt"></i></a>
+                      <h5 class="truncated">Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h5>
                     </div>
                     {% else %}
                     <input
@@ -225,9 +222,11 @@
                   </div>
                   {% endfor %}
 
-                  <button type="submit" class="btn btn-danger">
-                    Delete contribution
-                  </button>
+                  {% if can_update %}
+                    <a href="{% url 'update_contribution' pk=contribution.id %}" type="submit" class="btn btn-primary" >
+                      Update contribution
+                    </a>  
+                  {% endif %}
                 </form>
               </div>
             </div>
@@ -238,11 +237,10 @@
             <div class="navigation-container">
               <div class="navigation-options">
                 <!-- Add your navigation options here -->
-                <h4>Contribution feedbacks</h4>
+                <h4 style="margin-bottom: 5px;">Contribution feedbacks:</h4>
                 {% for comment in comments %}
                 <p>
-                  <strong>{{ comment.user.fullname }}:</strong>
-                  {{comment.comment }}
+                  <strong>{{ comment.user.fullname }}: </strong>{{comment.comment }}
                 </p>
                 {% endfor %}
               </div>

@@ -92,9 +92,11 @@ https://templatemo.com/tm-569-edu-meeting
                   </li>
                 </ul>
               </li>
+              {% if can_upload %}
               <li>
                 <a href="{% url 'file_upload'%}">Upload Contributions</a>
               </li>
+              {% endif %}
               {% if user.is_authenticated %}
               <!-- Display the form or user-specific content -->
               <li >
