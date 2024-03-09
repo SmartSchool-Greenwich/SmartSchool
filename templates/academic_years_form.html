@@ -29,249 +29,241 @@
     <link rel="stylesheet" href="{% static 'css/lightbox.css' %}" />
 
     <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f4;
-          margin: 0;
-          padding: 0;
-          height: 100vh;
-        }
-        form {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
-            margin: auto;
-          }
-          input[type="datetime-local"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            display: inline-block;
-          }
-  
-        .header-content {
-          margin: 30px;
-          padding: 10px auto;
-        }
-  
-        h2 {
-          text-align: center;
-          color: #fff;
-        }
-        .btn-primary {
-            background-color: #2c2e3d;
-            border-color: #2c2e3d;
-            width: 60%;
-        }
+      body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+      }
+      form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: auto;
+      }
+      input[type="datetime-local"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: inline-block;
+      }
 
-        .btn-primary:hover {
-            background-color: #536881;
-            border-color: #536881;
-        }
+      .header-content {
+        margin: 30px;
+        padding: 10px auto;
+      }
 
-      </style>
+      h2 {
+        text-align: center;
+        color: #fff;
+        margin: 20px 0;
+      }
+      
+      .btn-primary {
+        background-color: #2c2e3d;
+        border-color: #2c2e3d;
+        width: 60%;
+      }
+
+      .btn-primary:hover {
+        background-color: #536881;
+        border-color: #536881;
+      }
+    </style>
   </head>
-<body>
-     <!-- Sub Header -->
-     <div class="sub-header">
-        <div class="container">
-          <div class="row">
-            {% comment %}
-            <div class="col-lg-8 col-sm-8">
-              <div class="left-content">
-                <p>
-                  This is an educational <em>HTML CSS</em> template by TemplateMo
-                  website.
-                </p>
-              </div>
-            </div>
-            {% endcomment %} {% comment %}
-            <div class="col-lg-4 col-sm-4">
-              <div class="right-icons">
-                <ul>
-                  <li>
-                    <a href="#"><i class="fa fa-facebook"></i></a>
-                  </li>
-                  <li>
-                    <a href="#"><i class="fa fa-twitter"></i></a>
-                  </li>
-                  <li>
-                    <a href="#"><i class="fa fa-behance"></i></a>
-                  </li>
-                  <li>
-                    <a href="#"><i class="fa fa-linkedin"></i></a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            {% endcomment %}
+  <body>
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="main-nav">
+              <!-- ***** Logo Start ***** -->
+              <a href="{% url "home" %}" class="logo">
+                Edu Meeting
+              </a>
+              <!-- ***** Logo End ***** -->
+              <!-- ***** Menu Start ***** -->
+              <ul class="nav">
+                <li>
+                  <a href="{% url "home" %}">Home</a>
+                </li>
+                <li>
+                  <a href="{% url "list_academic_years" %}" class="active">Academic Years</a>
+                </li>
+                <li>
+                  <a href="{% url "list_faculties" %}">Faculties</a>
+                </li>
+                <li class="has-sub">
+                  <a href="javascript:void(0)">Contributions</a>
+                  <ul class="sub-menu">
+                    {%for f in faculties%}
+                    <li>
+                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                    </li>
+                    {%endfor%}
+                    <li>
+                        <a href="{%url 'show_contributions'%}">Download Contributions</a>
+                    </li>
+                    <li>
+                      <a href="{%url 'my_contributions'%}">View My</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="{% url 'file_upload'%}">Upload Contributions</a>
+                </li>
+                {% if user.is_authenticated %}
+                <!-- Display the form or user-specific content -->
+                <li >
+                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout'%}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
+                {% endif %}
+              </ul>
+              <a class='menu-trigger'>
+                <span>Menu</span>
+              </a>
+              <!-- ***** Menu End ***** -->
+            </nav>
           </div>
         </div>
       </div>
-  
-      <!-- ***** Header Area Start ***** -->
-      <header class="header-area header-sticky">
-        <div class="container">
-          <div class="row">
-            <div class="col-12">
-              <nav class="main-nav">
-                <!-- ***** Logo Start ***** -->
-                <a href="index.html" class="logo"> Edu Meeting </a>
-                <!-- ***** Logo End ***** -->
-                <!-- ***** Menu Start ***** -->
-                <ul class="nav">
-                  <li>
-                    <a href="{% url 'home' %}" class="active">Home</a>
-                  </li>
-                  <li><a href="meetings.html">Meetings</a></li>
-                  <li class="scroll-to-section">
-                    <a href="#apply">Apply Now</a>
-                  </li>
-                  <li class="has-sub">
-                    <a href="javascript:void(0)">Pages</a>
-                    <ul class="sub-menu">
-                      {%for f in faculties%}
-                      <li>
-                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
-                      </li>
-                      {%endfor%}
-                    </ul>
-                  </li>
-                  <li><a href="{% url 'file_upload'%}">Upload file</a></li>
-                  {% if user.is_authenticated %}
-                  <!-- Display the form or user-specific content -->
-                  <li><a href="#courses">hello {{request.user.username}}</a></li>
-                  <li><a href="{% url 'logout'%}">Logout</a></li>
-  
-                  {% else %}
-                  <li><a href="{% url 'login' %}">Login</a></li>
-                  {% endif %}
-                </ul>
-                <a class="menu-trigger">
-                  <span>Menu</span>
-                </a>
-                <!-- ***** Menu End ***** -->
-              </nav>
-            </div>
-          </div>
-        </div>
-      </header>
-      <!-- ***** Header Area End ***** -->
-<body>
-<section class="apply-now" id="apply">
-    <h2>Update Academic Year</h2>
-    <form action="" method="post">
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <section class="apply-now" id="apply">
+      <h2>Update Academic Year</h2>
+      <form action="" method="post">
         {% csrf_token %}
         <div>
-            <label for="closure">Closure Date:</label>
-            <input type="datetime-local" id="closure" name="closure" value="{{ academic_year.closure|date:'Y-m-d\TH:i' }}" required>
+          <label for="closure">Closure Date:</label>
+          <input
+            type="datetime-local"
+            id="closure"
+            name="closure"
+            value="{{ academic_year.closure|date:'Y-m-d\TH:i' }}"
+            required
+          />
         </div>
-        <br>
+        <br />
         <div>
-            <label for="finalClosure">Final Closure Date:</label>
-            <input type="datetime-local" id="finalClosure" name="finalClosure" value="{{ academic_year.finalClosure|date:'Y-m-d\TH:i' }}" required>
+          <label for="finalClosure">Final Closure Date:</label>
+          <input
+            type="datetime-local"
+            id="finalClosure"
+            name="finalClosure"
+            value="{{ academic_year.finalClosure|date:'Y-m-d\TH:i' }}"
+            required
+          />
         </div>
-        <br>
-        <div class="text-center"> <!-- Center the button -->
-            <button type="submit" class="btn btn-primary">Update</button>
+        <br />
+        <div class="text-center">
+          <!-- Center the button -->
+          <button type="submit" class="btn btn-primary">Update</button>
         </div>
-    </form>
-    
-</section>
+      </form>
+    </section>
     <section class="contact-us" id="contact">
-        <div class="footer">
-          <p>
-            Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
-            <br />
-            Design:
-            <a
-              href="https://templatemo.com"
-              target="_parent"
-              title="free css templates"
-              >TemplateMo</a
-            >
-            <br />
-            Distibuted By:
-            <a
-              href="https://themewagon.com"
-              target="_blank"
-              title="Build Better UI, Faster"
-              >ThemeWagon</a
-            >
-          </p>
-        </div>
-      </section>
-  
-      <!-- Scripts -->
-      <!-- Bootstrap core JavaScript -->
-      <script src="{%static 'vendor/jquery/jquery.min.js' %}"></script>
-      <script src="{%static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  
-      <script src="{%static 'js/isotope.min.js' %}"></script>
-      <script src="{%static 'js/owl-carousel.js' %}"></script>
-      <script src="{%static 'js/lightbox.js' %}"></script>
-      <script src="{%static 'js/tabs.js' %}"></script>
-      <script src="{%static 'js/video.js' %}"></script>
-      <script src="{%static 'js/slick-slider.js' %}"></script>
-      <script src="{%static 'js/custom.js' %}"></script>
-      <script>
-        //according to loftblog tut
-        $(".nav li:first").addClass("active");
-  
-        var showSection = function showSection(section, isAnimate) {
-          var direction = section.replace(/#/, ""),
-            reqSection = $(".section").filter(
-              '[data-section="' + direction + '"]'
-            ),
-            reqSectionPos = reqSection.offset().top - 0;
-  
-          if (isAnimate) {
-            $("body, html").animate(
-              {
-                scrollTop: reqSectionPos,
-              },
-              800
-            );
-          } else {
-            $("body, html").scrollTop(reqSectionPos);
+      <div class="footer">
+        <p>
+          Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
+          <br />
+          Design:
+          <a
+            href="https://templatemo.com"
+            target="_parent"
+            title="free css templates"
+            >TemplateMo</a
+          >
+          <br />
+          Distibuted By:
+          <a
+            href="https://themewagon.com"
+            target="_blank"
+            title="Build Better UI, Faster"
+            >ThemeWagon</a
+          >
+        </p>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="{%static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{%static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <script src="{%static 'js/isotope.min.js' %}"></script>
+    <script src="{%static 'js/owl-carousel.js' %}"></script>
+    <script src="{%static 'js/lightbox.js' %}"></script>
+    <script src="{%static 'js/tabs.js' %}"></script>
+    <script src="{%static 'js/video.js' %}"></script>
+    <script src="{%static 'js/slick-slider.js' %}"></script>
+    <script src="{%static 'js/custom.js' %}"></script>
+    <script>
+      //according to loftblog tut
+      $(".nav li:first").addClass("active");
+
+      var showSection = function showSection(section, isAnimate) {
+        var direction = section.replace(/#/, ""),
+          reqSection = $(".section").filter(
+            '[data-section="' + direction + '"]'
+          ),
+          reqSectionPos = reqSection.offset().top - 0;
+
+        if (isAnimate) {
+          $("body, html").animate(
+            {
+              scrollTop: reqSectionPos,
+            },
+            800
+          );
+        } else {
+          $("body, html").scrollTop(reqSectionPos);
+        }
+      };
+
+      var checkSection = function checkSection() {
+        $(".section").each(function () {
+          var $this = $(this),
+            topEdge = $this.offset().top - 80,
+            bottomEdge = topEdge + $this.height(),
+            wScroll = $(window).scrollTop();
+          if (topEdge < wScroll && bottomEdge > wScroll) {
+            var currentId = $this.data("section"),
+              reqLink = $("a").filter("[href*=\\#" + currentId + "]");
+            reqLink
+              .closest("li")
+              .addClass("active")
+              .siblings()
+              .removeClass("active");
           }
-        };
-  
-        var checkSection = function checkSection() {
-          $(".section").each(function () {
-            var $this = $(this),
-              topEdge = $this.offset().top - 80,
-              bottomEdge = topEdge + $this.height(),
-              wScroll = $(window).scrollTop();
-            if (topEdge < wScroll && bottomEdge > wScroll) {
-              var currentId = $this.data("section"),
-                reqLink = $("a").filter("[href*=\\#" + currentId + "]");
-              reqLink
-                .closest("li")
-                .addClass("active")
-                .siblings()
-                .removeClass("active");
-            }
-          });
-        };
-  
-        $(".main-menu, .responsive-menu, .scroll-to-section").on(
-          "click",
-          "a",
-          function (e) {
-            e.preventDefault();
-            showSection($(this).attr("href"), true);
-          }
-        );
-  
-        $(window).scroll(function () {
-          checkSection();
         });
-      </script>
-    </body>
-  </html>
+      };
+
+      $(".main-menu, .responsive-menu, .scroll-to-section").on(
+        "click",
+        "a",
+        function (e) {
+          e.preventDefault();
+          showSection($(this).attr("href"), true);
+        }
+      );
+
+      $(window).scroll(function () {
+        checkSection();
+      });
+    </script>
+  </body>
+</html>

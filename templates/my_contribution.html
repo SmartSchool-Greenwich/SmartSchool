@@ -1,51 +1,253 @@
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Contributions</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="TemplateMo" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/templatemo-edu-meeting.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/owl.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}" />
+
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
+      body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+      }
+
+      form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 2000px;
+        margin: auto;
+      }
+
+      .header-content {
+        margin: 30px;
+        padding: 10px auto;
+      }
+
+      h2 {
+        text-align: center;
+        color: #fff;
+        margin: 20px 0;
+      }
     </style>
-</head>
-<body>
-    <h1>My Contributions</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Created At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for contribution in contributions %}
-            <tr>
-                <td>{{ contribution.title }}</td>
-                <td>{{ contribution.content|default:"No description provided" }}</td>
-                <td>{{ contribution.createAt|date:"Y-m-d H:i" }}</td>
-                <td>
-                    <a href="">Update</a> | 
-                    <a href="" onclick="return confirm('Are you sure?');">Remove</a> | 
-                    <a href="">View Detail</a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="4">No contributions found.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</body>
+  </head>
+  <body>
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="main-nav">
+              <!-- ***** Logo Start ***** -->
+              <a href="{% url "home" %}" class="logo">
+                Edu Meeting
+              </a>
+              <!-- ***** Logo End ***** -->
+              <!-- ***** Menu Start ***** -->
+              <ul class="nav">
+                <li>
+                  <a href="{% url "home" %}">Home</a>
+                </li>
+                <li>
+                  <a href="{% url "list_academic_years" %}">Academic Years</a>
+                </li>
+                <li>
+                  <a href="{% url "list_faculties" %}">Faculties</a>
+                </li>
+                <li class="has-sub">
+                    <a href="javascript:void(0)" class="active">Contributions</a>
+                    <ul class="sub-menu">
+                        {%for f in faculties%}
+                        <li>
+                            <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                        </li>
+                        {%endfor%}
+                        <li>
+                            <a href="{%url 'show_contributions'%}">Download Contributions</a>
+                        </li>
+                        <li>
+                        <a href="{%url 'my_contributions'%}">View My</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                  <a href="{% url 'file_upload'%}">Upload Contributions</a>
+                </li>
+                {% if user.is_authenticated %}
+                <!-- Display the form or user-specific content -->
+                <li >
+                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout'%}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
+                {% endif %}
+              </ul>
+              <a class='menu-trigger'>
+                <span>Menu</span>
+              </a>
+              <!-- ***** Menu End ***** -->
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- Main Content -->
+    <section class="apply-now" id="apply">
+      <div class="container">
+        <h2>My Contributions</h2>
+        <form method="post" enctype="">
+          <table class="table mt-3">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Created Time</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for contribution in contributions %}
+              <tr>
+                  <td>{{ contribution.title }}</td>
+                  <td>{{ contribution.content|default:"No description provided" }}</td>
+                  <td>{{ contribution.createAt|date:"H:i d-m-Y" }}</td>
+                  <td>
+                      <a href="" class="btn btn-primary btn-sm">Update</a> | 
+                      <a href="" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</a> | 
+                      <a href="" class="btn btn-warning btn-sm">View Detail</a>
+                  </td>
+              </tr>
+            {% empty %}
+              <tr>
+                  <td colspan="4">No contributions found.</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </section>
+
+    <section class="contact-us" id="contact">
+      <div class="footer">
+        <p>
+          Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
+          <br />
+          Design:
+          <a
+            href="https://templatemo.com"
+            target="_parent"
+            title="free css templates"
+            >TemplateMo</a>
+          <br />
+          Distibuted By:
+          <a
+            href="https://themewagon.com"
+            target="_blank"
+            title="Build Better UI, Faster"
+            >ThemeWagon</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="{%static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{%static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <script src="{%static 'js/isotope.min.js' %}"></script>
+    <script src="{%static 'js/owl-carousel.js' %}"></script>
+    <script src="{%static 'js/lightbox.js' %}"></script>
+    <script src="{%static 'js/tabs.js' %}"></script>
+    <script src="{%static 'js/video.js' %}"></script>
+    <script src="{%static 'js/slick-slider.js' %}"></script>
+    <script src="{%static 'js/custom.js' %}"></script>
+    <script>
+      //according to loftblog tut
+      $(".nav li:first").addClass("active");
+
+      var showSection = function showSection(section, isAnimate) {
+        var direction = section.replace(/#/, ""),
+          reqSection = $(".section").filter(
+            '[data-section="' + direction + '"]'
+          ),
+          reqSectionPos = reqSection.offset().top - 0;
+
+        if (isAnimate) {
+          $("body, html").animate(
+            {
+              scrollTop: reqSectionPos,
+            },
+            800
+          );
+        } else {
+          $("body, html").scrollTop(reqSectionPos);
+        }
+      };
+
+      var checkSection = function checkSection() {
+        $(".section").each(function () {
+          var $this = $(this),
+            topEdge = $this.offset().top - 80,
+            bottomEdge = topEdge + $this.height(),
+            wScroll = $(window).scrollTop();
+          if (topEdge < wScroll && bottomEdge > wScroll) {
+            var currentId = $this.data("section"),
+              reqLink = $("a").filter("[href*=\\#" + currentId + "]");
+            reqLink
+              .closest("li")
+              .addClass("active")
+              .siblings()
+              .removeClass("active");
+          }
+        });
+      };
+
+      $(".main-menu, .responsive-menu, .scroll-to-section").on(
+        "click",
+        "a",
+        function (e) {
+          e.preventDefault();
+          showSection($(this).attr("href"), true);
+        }
+      );
+
+      $(window).scroll(function () {
+        checkSection();
+      });
+    </script>
+  </body>
 </html>

@@ -30,7 +30,6 @@
 
     <style>
       container {
-        font-family: "Arial", sans-serif;
         background-color: #f5f5f5;
         padding: 20px;
       }
@@ -97,43 +96,6 @@
   </head>
 
   <body>
-    <!-- Sub Header -->
-    <div class="sub-header">
-      <div class="container">
-        <div class="row">
-          {% comment %}
-          <div class="col-lg-8 col-sm-8">
-            <div class="left-content">
-              <p>
-                This is an educational <em>HTML CSS</em> template by TemplateMo
-                website.
-              </p>
-            </div>
-          </div>
-          {% endcomment %} {% comment %}
-          <div class="col-lg-4 col-sm-4">
-            <div class="right-icons">
-              <ul>
-                <li>
-                  <a href="#"><i class="fa fa-facebook"></i></a>
-                </li>
-                <li>
-                  <a href="#"><i class="fa fa-twitter"></i></a>
-                </li>
-                <li>
-                  <a href="#"><i class="fa fa-behance"></i></a>
-                </li>
-                <li>
-                  <a href="#"><i class="fa fa-linkedin"></i></a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          {% endcomment %}
-        </div>
-      </div>
-    </div>
-
     <!-- ***** Header Area Start ***** -->
     <header class="header-area header-sticky">
       <div class="container">
@@ -141,38 +103,55 @@
           <div class="col-12">
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
-              <a href="index.html" class="logo"> Edu Meeting </a>
+              <a href="{% url "home" %}" class="logo">
+                Edu Meeting
+              </a>
               <!-- ***** Logo End ***** -->
               <!-- ***** Menu Start ***** -->
               <ul class="nav">
                 <li>
-                  <a href="{% url 'home' %}" class="active">Home</a>
+                  <a href="{% url "home" %}">Home</a>
                 </li>
-                <li><a href="meetings.html">Meetings</a></li>
-                <li class="scroll-to-section">
-                  <a href="#apply">Apply Now</a>
+                <li>
+                  <a href="{% url "list_academic_years" %}">Academic Years</a>
+                </li>
+                <li>
+                  <a href="{% url "list_faculties" %}">Faculties</a>
                 </li>
                 <li class="has-sub">
-                  <a href="javascript:void(0)">Pages</a>
+                  <a href="javascript:void(0)">Contributions</a>
                   <ul class="sub-menu">
                     {%for f in faculties%}
                     <li>
-                      <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
                     </li>
                     {%endfor%}
+                    <li>
+                        <a href="{%url 'show_contributions'%}">Download Contributions</a>
+                    </li>
+                    <li>
+                      <a href="{%url 'my_contributions'%}">View My</a>
+                    </li>
                   </ul>
                 </li>
-                <li><a href="{% url 'file_upload'%}">Upload file</a></li>
+                <li>
+                  <a href="{% url 'file_upload'%}" class="active">Upload Contributions</a>
+                </li>
                 {% if user.is_authenticated %}
                 <!-- Display the form or user-specific content -->
-                <li><a href="#courses">hello {{request.user.username}}</a></li>
-                <li><a href="{% url 'logout'%}">Logout</a></li>
-
+                <li >
+                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout'%}">Logout</a>
+                </li>
                 {% else %}
-                <li><a href="{% url 'login' %}">Login</a></li>
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
                 {% endif %}
               </ul>
-              <a class="menu-trigger">
+              <a class='menu-trigger'>
                 <span>Menu</span>
               </a>
               <!-- ***** Menu End ***** -->

@@ -36,7 +36,6 @@
 
     <style>
       body {
-        font-family: Arial, sans-serif;
         background-color: #f4f4f4;
         margin: 0;
         padding: 0;
@@ -117,38 +116,55 @@
           <div class="col-12">
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
-              <a href="index.html" class="logo"> Edu Meeting </a>
+              <a href="{% url "home" %}" class="logo">
+                Edu Meeting
+              </a>
               <!-- ***** Logo End ***** -->
               <!-- ***** Menu Start ***** -->
               <ul class="nav">
                 <li>
-                  <a href="{% url 'home' %}" class="active">Home</a>
+                  <a href="{% url "home" %}">Home</a>
                 </li>
-                <li><a href="meetings.html">Meetings</a></li>
-                <li class="scroll-to-section">
-                  <a href="#apply">Apply Now</a>
+                <li>
+                  <a href="{% url "list_academic_years" %}">Academic Years</a>
+                </li>
+                <li>
+                  <a href="{% url "list_faculties" %}">Faculties</a>
                 </li>
                 <li class="has-sub">
-                  <a href="javascript:void(0)">Pages</a>
+                  <a href="javascript:void(0)" class="active">Contributions</a>
                   <ul class="sub-menu">
                     {%for f in faculties%}
                     <li>
-                      <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
                     </li>
                     {%endfor%}
+                    <li>
+                        <a href="{%url 'show_contributions'%}">Download Contributions</a>
+                    </li>
+                    <li>
+                      <a href="{%url 'my_contributions'%}">View My</a>
+                    </li>
                   </ul>
                 </li>
-                <li><a href="{% url 'file_upload'%}">Upload file</a></li>
+                <li>
+                  <a href="{% url 'file_upload'%}">Upload Contributions</a>
+                </li>
                 {% if user.is_authenticated %}
                 <!-- Display the form or user-specific content -->
-                <li><a href="#courses">hello {{request.user.username}}</a></li>
-                <li><a href="{% url 'logout'%}">Logout</a></li>
-
+                <li >
+                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout'%}">Logout</a>
+                </li>
                 {% else %}
-                <li><a href="{% url 'login' %}">Login</a></li>
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
                 {% endif %}
               </ul>
-              <a class="menu-trigger">
+              <a class='menu-trigger'>
                 <span>Menu</span>
               </a>
               <!-- ***** Menu End ***** -->
