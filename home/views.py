@@ -10,6 +10,8 @@ from django.urls import reverse
 import zipfile
 from io import BytesIO
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -111,6 +113,24 @@ def file_upload_view(request):
                 else:
                     contribution_file.img = file
                 contribution_file.save()
+            
+            #sendmail
+            marketing_coordinator_role = Role.get_marketing_coordinator_role()
+            if marketing_coordinator_role:
+                coordinator_profiles = UserProfile.objects.filter(
+                    roles=marketing_coordinator_role,
+                    faculty=faculty
+                )
+
+                recipient_list = [coordinator.email for coordinator in coordinator_profiles if coordinator.email]
+                if recipient_list:
+                    send_mail(
+                        subject='New Contribution Submitted',
+                        message=f'A new contribution "{title}" has been submitted to {faculty.name} by {request.user.userprofile.fullname}.',
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=recipient_list,
+                    )
+
 
             return redirect('success_url') 
         except Faculties.DoesNotExist:

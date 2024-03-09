@@ -7,6 +7,9 @@ class Role(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def get_marketing_coordinator_role():
+        return Role.objects.filter(name='Marketing Coordinator').first()
 
     @classmethod
     def create_default_role(cls):
