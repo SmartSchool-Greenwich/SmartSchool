@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from .models import ContributionFiles, UserProfile, Faculties, Contributions, Role,AcademicYear, Comment
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_datetime
-from .forms import CommentForm, FileForm
+from .forms import CommentForm, FileForm, RoleForm
 from django.urls import reverse
 import zipfile
 from io import BytesIO
@@ -470,3 +470,18 @@ def remove_faculty(request, faculty_id):
     faculty = get_object_or_404(Faculties, pk=faculty_id)
     faculty.delete()
     return redirect('list_faculties')
+
+
+def create_role(request):
+    if request.method == "POST":
+        form = RoleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('role_list')  # giả sử bạn có một trang hiển thị danh sách các roles
+    else:
+        form = RoleForm()
+    return render(request, 'create_role.html', {'form': form})
+
+def role_list(request):
+    roles = Role.objects.all()
+    return render(request, 'role_list.html', {'roles': roles})

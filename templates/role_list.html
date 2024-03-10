@@ -1,0 +1,7 @@
+<!-- role_list.html -->
+<h2>Role List</h2>
+<ul>
+  {% for role in roles %}
+    <li>{{ role.name }} - {{ role.description }}</li>
+  {% endfor %}
+</ul>

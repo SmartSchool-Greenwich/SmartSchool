@@ -1,0 +1,7 @@
+<!-- role_create.html -->
+<h2>Create New Role</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Role</button>
+</form>
