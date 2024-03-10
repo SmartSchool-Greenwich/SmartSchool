@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Count
+from django.contrib import messages
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -487,6 +488,12 @@ def role_list(request):
     roles = Role.objects.all()
     return render(request, 'role_list.html', {'roles': roles})
 
+def delete_role(request, role_id):
+    role = get_object_or_404(Role, id=role_id)
+    role.delete()
+    messages.success(request, 'The role has been successfully deleted!')
+    return redirect('role_list') 
+
 
 def all_contributions_view(request):
     contributions = Contributions.objects.all()  # Fetch all contributions from the database
@@ -575,3 +582,24 @@ def statistical_analysis(request):
         'approved_by_faculty': approved_counts,
     }
     return render(request, 'statistical_analysis.html', context)
+
+
+def admin(request):
+    faculties = Faculties.objects.all()
+    can_upload = False 
+    
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            faculty = user_profile.faculty
+            academic_year = faculty.academicYear if faculty else None
+            if academic_year and timezone.now() < academic_year.closure:
+                can_upload = True
+        except UserProfile.DoesNotExist:
+            can_upload = False
+    
+    context = {
+        'faculties': faculties,
+        'can_upload': can_upload,
+    }
+    return render(request, 'ad_index.html', context)

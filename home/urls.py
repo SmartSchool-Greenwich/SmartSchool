@@ -10,7 +10,6 @@ urlpatterns = [
     path('contribution/update/<int:pk>/', views.update_contribution, name='update_contribution'),
     path('contribution/delete/<int:pk>/', views.delete_contribution, name='delete_contribution'),
     path('upload/success/', views.upload_success, name='success_url'),
-    path('create_account/', views.create_account, name='create_account'),
     path('faculties/<int:faculty_id>/files/', views.faculty_files, name='faculty_files'),
     path('show-contributions/', views.show_contributions, name='show_contributions'),
     path('download/contributions/', views.download_selected_contributions, name='download_selected_contributions'),
@@ -34,15 +33,19 @@ urlpatterns = [
     path('faculties/update/<int:faculty_id>/', views.update_faculty, name='update_faculty'),
     path('faculties/remove/<int:faculty_id>/', views.remove_faculty, name='remove_faculty'),
 
-    path('create_role/', views.create_role, name='create_role'),
-    path('role_list/', views.role_list, name='role_list'),
 
-    path('manage_contributions/', views.all_contributions_view, name='manage_contributions'),
-    path('approve_contribution/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
+    path('ad/roles/create/', views.create_role, name='create_role'),
+    path('ad/roles/', views.role_list, name='role_list'),
+    path('ad/roles/<int:role_id>/', views.delete_role, name='delete_role'),
 
-    path('accounts/', views.account_list, name='account_list'),
-    path('accounts/edit/<int:pk>/', views.account_update, name='account_edit'),
-    path('accounts/delete/<int:pk>/', views.account_delete, name='account_delete'),
+    path('ad/contributions/manage/', views.all_contributions_view, name='manage_contributions'),
+    path('ad/contribution/approve/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
+
+    path('ad/accounts/', views.account_list, name='account_list'),
+    path('ad/account/create/', views.create_account, name='create_account'),
+    path('ad/accounts/edit/<int:pk>/', views.account_update, name='account_edit'),
+    path('ad/accounts/delete/<int:pk>/', views.account_delete, name='account_delete'),
     
-    path('statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
+    path('ad/statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
+
 ]
