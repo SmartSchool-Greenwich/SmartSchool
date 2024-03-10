@@ -485,3 +485,21 @@ def create_role(request):
 def role_list(request):
     roles = Role.objects.all()
     return render(request, 'role_list.html', {'roles': roles})
+
+
+def all_contributions_view(request):
+    contributions = Contributions.objects.all()  # Fetch all contributions from the database
+    context = {
+        'contributions': contributions
+    }
+    return render(request, 'manage_contributions.html', context)
+
+
+def approve_contribution(request, contribution_id):
+    contribution = get_object_or_404(Contributions, id=contribution_id)
+    if request.method == "POST":
+        contribution.status = True  # Set status to True to represent "Approved"
+        contribution.save()
+        return redirect('manage_contributions')  # Redirect to the feedback management page or wherever appropriate
+    else:
+        return redirect('manage_contribution')  # Redirect if the method is not POST

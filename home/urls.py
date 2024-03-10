@@ -37,4 +37,7 @@ urlpatterns = [
     path('create_role/', views.create_role, name='create_role'),
     path('role_list/', views.role_list, name='role_list'),
 
+    path('manage_contributions/', views.all_contributions_view, name='manage_contributions'),
+    path('contributions/approve/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
+
 ]

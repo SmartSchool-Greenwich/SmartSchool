@@ -1,0 +1,282 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="TemplateMo" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/templatemo-edu-meeting.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/owl.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}" />
+
+    <style>
+      body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+      }
+      form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: auto;
+      }
+      input[type="datetime-local"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: inline-block;
+      }
+
+      .header-content {
+        margin: 30px;
+        padding: 10px auto;
+      }
+
+      h2 {
+        text-align: center;
+        color: #fff;
+        margin: 20px 0;
+      }
+      
+      .btn-primary {
+        background-color: #2c2e3d;
+        border-color: #2c2e3d;
+        width: 60%;
+      }
+
+      .btn-primary:hover {
+        background-color: #536881;
+        border-color: #536881;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="main-nav">
+              <!-- ***** Logo Start ***** -->
+              <a href="{% url "home" %}" class="logo">
+                Edu Meeting
+              </a>
+              <!-- ***** Logo End ***** -->
+              <!-- ***** Menu Start ***** -->
+              <ul class="nav">
+                <li>
+                  <a href="{% url "home" %}">Home</a>
+                </li>
+                <li>
+                  <a href="{% url "list_academic_years" %}" class="active">Academic Years</a>
+                </li>
+                <li>
+                  <a href="{% url "list_faculties" %}">Faculties</a>
+                </li>
+                <li class="has-sub">
+                  <a href="javascript:void(0)">Contributions</a>
+                  <ul class="sub-menu">
+                    {%for f in faculties%}
+                    <li>
+                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
+                    </li>
+                    {%endfor%}
+                    <li>
+                        <a href="{%url 'show_contributions'%}">Download Contributions</a>
+                    </li>
+                    <li>
+                      <a href="{%url 'my_contributions'%}">View My</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="{% url 'file_upload'%}">Upload Contributions</a>
+                </li>
+                {% if user.is_authenticated %}
+                <!-- Display the form or user-specific content -->
+                <li >
+                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout'%}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
+                {% endif %}
+              </ul>
+              <a class='menu-trigger'>
+                <span>Menu</span>
+              </a>
+              <!-- ***** Menu End ***** -->
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <section class="apply-now" id="apply">
+        <div class="container">
+          <h2>Feedback Manage</h2>
+          <form method="post" enctype="">
+            <table class="table mt-3">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Student Name</th>
+                  <th scope="col">Article Title</th>
+                  <th scope="col">Submission Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for contribution in contributions %}
+                <tr>
+                    <td>{{ contribution.userProfile.fullname }}</td>
+                    <td>{{ contribution.title }}</td>
+                    <td>{{ contribution.createAt }}</td>
+                    <td>
+                        {% if contribution.status %}
+                            Approved
+                        {% else %}
+                            Waiting
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not contribution.status %}
+                        <a href="{% url 'approve_contribution' contribution.id %}" >
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </form>
+        </div>
+      </section>
+  
+
+    
+    <section class="contact-us" id="contact">
+      <div class="footer">
+        <p>
+          Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
+          <br />
+          Design:
+          <a
+            href="https://templatemo.com"
+            target="_parent"
+            title="free css templates"
+            >TemplateMo</a
+          >
+          <br />
+          Distibuted By:
+          <a
+            href="https://themewagon.com"
+            target="_blank"
+            title="Build Better UI, Faster"
+            >ThemeWagon</a
+          >
+        </p>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="{%static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{%static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <script src="{%static 'js/isotope.min.js' %}"></script>
+    <script src="{%static 'js/owl-carousel.js' %}"></script>
+    <script src="{%static 'js/lightbox.js' %}"></script>
+    <script src="{%static 'js/tabs.js' %}"></script>
+    <script src="{%static 'js/video.js' %}"></script>
+    <script src="{%static 'js/slick-slider.js' %}"></script>
+    <script src="{%static 'js/custom.js' %}"></script>
+    <script>
+      //according to loftblog tut
+      $(".nav li:first").addClass("active");
+
+      var showSection = function showSection(section, isAnimate) {
+        var direction = section.replace(/#/, ""),
+          reqSection = $(".section").filter(
+            '[data-section="' + direction + '"]'
+          ),
+          reqSectionPos = reqSection.offset().top - 0;
+
+        if (isAnimate) {
+          $("body, html").animate(
+            {
+              scrollTop: reqSectionPos,
+            },
+            800
+          );
+        } else {
+          $("body, html").scrollTop(reqSectionPos);
+        }
+      };
+
+      var checkSection = function checkSection() {
+        $(".section").each(function () {
+          var $this = $(this),
+            topEdge = $this.offset().top - 80,
+            bottomEdge = topEdge + $this.height(),
+            wScroll = $(window).scrollTop();
+          if (topEdge < wScroll && bottomEdge > wScroll) {
+            var currentId = $this.data("section"),
+              reqLink = $("a").filter("[href*=\\#" + currentId + "]");
+            reqLink
+              .closest("li")
+              .addClass("active")
+              .siblings()
+              .removeClass("active");
+          }
+        });
+      };
+
+      $(".main-menu, .responsive-menu, .scroll-to-section").on(
+        "click",
+        "a",
+        function (e) {
+          e.preventDefault();
+          showSection($(this).attr("href"), true);
+        }
+      );
+
+      $(window).scroll(function () {
+        checkSection();
+      });
+    </script>
+  </body>
+</html>
