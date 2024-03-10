@@ -12,6 +12,7 @@ from io import BytesIO
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Count
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -497,9 +498,80 @@ def all_contributions_view(request):
 
 def approve_contribution(request, contribution_id):
     contribution = get_object_or_404(Contributions, id=contribution_id)
-    if request.method == "POST":
-        contribution.status = True  # Set status to True to represent "Approved"
+    status = request.GET.get('approve')
+    
+    if request.method == "GET":
+        if status == "app":  # Được thay đổi từ "Approve" thành "app" cho phù hợp với tham số URL
+            contribution.status = True
+        elif status == "dis":  # Được thay đổi từ "Disapprove" thành "dis" cho phù hợp
+            contribution.status = False
         contribution.save()
-        return redirect('manage_contributions')  # Redirect to the feedback management page or wherever appropriate
+        return redirect('manage_contributions')
     else:
-        return redirect('manage_contribution')  # Redirect if the method is not POST
+        return redirect('home')  # Redirect if the method is not POST
+    
+#account:
+def account_list(request):
+    accounts = UserProfile.objects.all()
+    return render(request, 'listAccount.html', {'accounts': accounts})
+
+def account_update(request, pk):
+    user_profile = get_object_or_404(UserProfile, pk=pk)
+
+    if request.method == 'POST':
+        # Cập nhật thông tin cơ bản
+        user_profile.fullname = request.POST.get('fullname')
+        user_profile.email = request.POST.get('email')
+        user_profile.phone = request.POST.get('phone')
+
+        # Cập nhật faculty
+        faculty_id = request.POST.get('faculty')
+        if faculty_id:
+            user_profile.faculty = Faculties.objects.get(id=faculty_id)
+        else:
+            user_profile.faculty = None
+
+        user_profile.save()
+
+        # Cập nhật roles
+        selected_roles = request.POST.getlist('roles')
+        user_profile.roles.clear()
+        for role_id in selected_roles:
+            role = Role.objects.get(id=role_id)
+            user_profile.roles.add(role)
+
+        return redirect('account_list')
+    else:
+        faculties = Faculties.objects.all()
+        roles = Role.objects.all()
+        return render(request, 'editAccount.html', {
+            'user_profile': user_profile,
+            'faculties': faculties,
+            'roles': roles
+        })
+
+def account_delete(request, pk):
+    if request.method == 'POST':
+        account = get_object_or_404(UserProfile, pk=pk)
+        account.delete()
+        return redirect('account_list')
+    
+def statistical_analysis(request):
+    total_contributions = Contributions.objects.count()
+    approved_contributions = Contributions.objects.filter(status=True).count()
+
+    contributions_by_faculty = Contributions.objects.values('faculty__name').annotate(total=Count('id'))
+    approved_by_faculty = Contributions.objects.filter(status=True).values('faculty__name').annotate(total=Count('id'))
+
+    faculty_names = [item['faculty__name'] for item in contributions_by_faculty]
+    contributions_counts = [item['total'] for item in contributions_by_faculty]
+    approved_counts = [item['total'] for item in approved_by_faculty]
+
+    context = {
+        'total_contributions': total_contributions,
+        'approved_contributions': approved_contributions,
+        'faculty_names': faculty_names,
+        'contributions_by_faculty': contributions_counts,
+        'approved_by_faculty': approved_counts,
+    }
+    return render(request, 'statistical_analysis.html', context)

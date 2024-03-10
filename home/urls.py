@@ -38,6 +38,11 @@ urlpatterns = [
     path('role_list/', views.role_list, name='role_list'),
 
     path('manage_contributions/', views.all_contributions_view, name='manage_contributions'),
-    path('contributions/approve/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
+    path('approve_contribution/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
 
+    path('accounts/', views.account_list, name='account_list'),
+    path('accounts/edit/<int:pk>/', views.account_update, name='account_edit'),
+    path('accounts/delete/<int:pk>/', views.account_delete, name='account_delete'),
+    
+    path('statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
 ]

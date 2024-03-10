@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Account</title>
+</head>
+<body>
+    <h1>Edit Account</h1>
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" name="fullname" value="{{ user_profile.fullname }}"><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user_profile.email }}"><br><br>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" value="{{ user_profile.phone }}"><br><br>
+
+        <label for="faculty">Faculty:</label>
+        <select id="faculty" name="faculty">
+            <option value="">Please choose</option>
+            {% for faculty in faculties %}
+            <option value="{{ faculty.id }}" {% if user_profile.faculty.id == faculty.id %}selected{% endif %}>
+                {{ faculty.name }}
+            </option>
+            {% endfor %}
+        </select><br><br>
+
+        <fieldset>
+            <legend>Roles:</legend>
+            {% for role in roles %}
+            <div>
+                <input type="checkbox" id="role_{{ role.id }}" name="roles" value="{{ role.id }}"
+                {% if role in user_profile.roles.all %} checked {% endif %}>
+                <label for="role_{{ role.id }}">{{ role.name }}</label>
+            </div>
+            {% endfor %}
+        </fieldset>
+
+        <input type="submit" value="Update">
+    </form>
+</body>
+</html>

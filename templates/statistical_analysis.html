@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistical Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        width: 600px;
+        margin: auto;
+      }
+      canvas {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 5px #ccc;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="text-align: center">Statistical Analysis</h1>
+
+    <div class="chart-container">
+      <h2>Total and Approved Contributions</h2>
+      <canvas id="contributionsPieChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <h2>Contributions by Faculty</h2>
+      <canvas id="contributionsByFacultyPieChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <h2>Approved Contributions by Faculty</h2>
+      <canvas id="approvedByFacultyPieChart"></canvas>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const facultyNames = {{ faculty_names|safe }};
+          const contributionsByFaculty = {{ contributions_by_faculty|safe }};
+          const approvedByFaculty = {{ approved_by_faculty|safe }};
+
+          // Total and Approved Contributions Pie Chart
+          new Chart(document.getElementById('contributionsPieChart'), {
+              type: 'pie',
+              data: {
+                  labels: ['Total Contributions', 'Approved Contributions'],
+                  datasets: [{
+                      data: [{{ total_contributions }}, {{ approved_contributions }}],
+                      backgroundColor: ['#4e73df', '#1cc88a'],
+                  }]
+              }
+          });
+
+          // Contributions by Faculty Pie Chart
+          new Chart(document.getElementById('contributionsByFacultyPieChart'), {
+              type: 'pie',
+              data: {
+                  labels: facultyNames,
+                  datasets: [{
+                      data: contributionsByFaculty,
+                      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                  }]
+              }
+          });
+
+          // Approved Contributions by Faculty Pie Chart
+          new Chart(document.getElementById('approvedByFacultyPieChart'), {
+              type: 'pie',
+              data: {
+                  labels: facultyNames,
+                  datasets: [{
+                      data: approvedByFaculty,
+                      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                  }]
+              }
+          });
+      });
+    </script>
+  </body>
+</html>

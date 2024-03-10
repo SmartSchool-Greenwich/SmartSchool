@@ -160,7 +160,12 @@
               <tbody>
                 {% for contribution in contributions %}
                 <tr>
-                    <td>{{ contribution.userProfile.fullname }}</td>
+                    <td>
+                      {% for user in contribution.user.all %}
+                          {{ user.fullname }}
+                          {% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    </td>
                     <td>{{ contribution.title }}</td>
                     <td>{{ contribution.createAt }}</td>
                     <td>
@@ -171,13 +176,12 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if not contribution.status %}
-                        <a href="{% url 'approve_contribution' contribution.id %}" >
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success">Approve</button>
-                        </a>
-                        {% endif %}
-                    </td>
+                      {% if not contribution.status %}
+                          <a href="{% url 'approve_contribution' contribution.id %}?approve=app" class="btn btn-success">Approve</a>
+                      {% else %}
+                          <a href="{% url 'approve_contribution' contribution.id %}?approve=dis" class="btn btn-danger">Disapprove</a>
+                      {% endif %}
+                    </td>                  
                 </tr>
                 {% endfor %}
               </tbody>
