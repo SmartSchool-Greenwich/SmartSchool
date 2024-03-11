@@ -71,27 +71,64 @@ def logout_view(request):
     return redirect('home')
 
 def home(request):
-    faculties = Faculties.objects.all()
-    can_upload = False 
-    
+    can_upload = False
+    is_admin = False
+    is_coordinator = False
+    is_director = False
+    is_student = False
+    show_faculties = True  
+    faculties = Faculties.objects.none() 
+
     if request.user.is_authenticated:
         try:
             user_profile = request.user.userprofile
             faculty = user_profile.faculty
             academic_year = faculty.academicYear if faculty else None
+            roles = [role.name for role in user_profile.roles.all()]
+
             if academic_year and timezone.now() < academic_year.closure:
                 can_upload = True
+
+            if "admin" in roles or "marketing director" in roles:
+                faculties = Faculties.objects.all()
+                is_director = True
+            elif "admin" in roles:
+                is_admin = True
+            elif "marketing coordinator" in roles:
+                faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
+                is_coordinator = True
+            else:
+                is_student = True
+                show_faculties = False
+
         except UserProfile.DoesNotExist:
             can_upload = False
-    
+            show_faculties = False
+    else:   
+        faculties = Faculties.objects.all()
+        
     context = {
         'faculties': faculties,
         'can_upload': can_upload,
+        'is_admin': is_admin,
+        'is_coordinator': is_coordinator,
+        'is_director': is_director,
+        'is_student': is_student,
+        'show_faculties': show_faculties,
     }
     return render(request, 'home.html', context)
 
+
 def file_upload_view(request):
-    faculties = Faculties.objects.all()
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            user_faculty = user_profile.faculty
+            if user_faculty:
+                faculties = Faculties.objects.filter(id=user_faculty.id)
+        except UserProfile.DoesNotExist:
+            pass  
+        
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
@@ -227,8 +264,11 @@ def create_account(request):
 
 
 def faculty_files(request, faculty_id):
+    is_guest = True
+    if request.user.is_authenticated:
+        is_guest = False
     faculty = get_object_or_404(Faculties, pk=faculty_id)
-    contributions = Contributions.objects.filter(faculty=faculty)
+    contributions = Contributions.objects.filter(faculty=faculty, status=True)
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
     comment_form = CommentForm()
     if request.method == 'POST':
@@ -246,10 +286,13 @@ def faculty_files(request, faculty_id):
                 return redirect('faculty_files', faculty_id=faculty_id)
             except Contributions.DoesNotExist:
                 return HttpResponse("Contribution does not exist", status=404)
-    return render(request, 'faculty_file.html', {'faculty': faculty, 'files': files})
+    return render(request, 'faculty_file.html', {'faculty': faculty, 
+                                                 'files': files, 
+                                                 'is_guest': is_guest,
+                                                 'contributions': contributions})
 
 def show_contributions(request):
-    contributions = Contributions.objects.all()
+    contributions = Contributions.objects.filter(status=True)
     
     return render(request, 'show_contribution.html', {'contributions': contributions})
 
@@ -582,24 +625,3 @@ def statistical_analysis(request):
         'approved_by_faculty': approved_counts,
     }
     return render(request, 'statistical_analysis.html', context)
-
-
-def admin(request):
-    faculties = Faculties.objects.all()
-    can_upload = False 
-    
-    if request.user.is_authenticated:
-        try:
-            user_profile = request.user.userprofile
-            faculty = user_profile.faculty
-            academic_year = faculty.academicYear if faculty else None
-            if academic_year and timezone.now() < academic_year.closure:
-                can_upload = True
-        except UserProfile.DoesNotExist:
-            can_upload = False
-    
-    context = {
-        'faculties': faculties,
-        'can_upload': can_upload,
-    }
-    return render(request, 'ad_index.html', context)

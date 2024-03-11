@@ -70,9 +70,16 @@ https://templatemo.com/tm-569-edu-meeting
               <li>
                 <a href="{% url "home" %}" class="active">Home</a>
               </li>
+              {% if is_admin %}
               <li>
-                <a href="{% url "statistical_analysis" %}">Administator</a>
+                  <a href="{% url "statistical_analysis" %}">Administrator</a>
               </li>
+              {% endif %}
+              {% if is_coordinator %}
+              <li>
+                  <a href="{% url "manage_contributions" %}">Contribution Management</a>
+              </li>
+              {% endif %}
               <li>
                 <a href="{% url "list_academic_years" %}">Academic Years</a>
               </li>
@@ -82,20 +89,26 @@ https://templatemo.com/tm-569-edu-meeting
               <li class="has-sub">
                 <a href="javascript:void(0)">Contributions</a>
                 <ul class="sub-menu">
-                  {%for f in faculties%}
-                  <li>
-                      <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
-                  </li>
-                  {%endfor%}
-                  <li>
-                      <a href="{%url 'show_contributions'%}">Download Contributions</a>
-                  </li>
-                  <li>
-                    <a href="{%url 'my_contributions'%}">View My</a>
-                  </li>
+                    {% if show_faculties %}
+                        {% for f in faculties %}
+                        <li>
+                            <a href="{% url 'faculty_files' f.id %}">{{ f.name }}</a>
+                        </li>
+                        {% endfor %}
+                    {% endif %}
+                    {% if is_director %}
+                    <li>
+                        <a href="{% url 'show_contributions' %}">Download Contributions</a>
+                    </li>
+                    {% endif %}
+                    {% if is_student %}
+                    <li>
+                      <a href="{% url 'my_contributions' %}">View My</a>
+                    </li>
+                    {% endif %}
                 </ul>
-              </li>
-              {% if can_upload %}
+              </li>            
+              {% if can_upload and not is_coordinator and not is_director and not is_admin %}
               <li>
                 <a href="{% url 'file_upload'%}">Upload Contributions</a>
               </li>

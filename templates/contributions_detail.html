@@ -202,25 +202,13 @@
                       {% comment %} <a href=""><i class="fas fa-trash-alt"></i></a> {% endcomment %}
                     </div>
                     {% else %}
-                    <input
-                      type="file"
-                      class="form-control-file"
-                      id="fileInput"
-                      name="fileInput"
-                      accept="image/*"
-                    />
+                    <h5>Document: <span style="font-size: 15px;">File does not exist</span></h5>
                     {% endif %} {% if file.img %}
                     <div class="content">
                       <h5 class="truncated">Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h5>
                     </div>
                     {% else %}
-                    <input
-                      type="file"
-                      class="form-control-file"
-                      id="fileInput"
-                      name="fileInput"
-                      accept="image/*"
-                    />
+                    <h5>Image: <span style="font-size: 15px;">File does not exist</span></h5>
                     {% endif %}
                   </div>
                   {% endfor %}

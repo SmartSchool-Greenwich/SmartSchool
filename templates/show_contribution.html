@@ -147,14 +147,25 @@
                 <tr>
                     <td>{{ contribution.title }}</td>
                     {% for file in contribution.files.all %}
-                    <!-- Hiển thị tên file và/hoặc link để xem file nếu bạn muốn -->
                     <td>
+                      {% if file.word %}
                       <div>
                         <a href="{{ file.word.url }}">Document: {{ file.word.name }}</a>
                       </div>
+                      {% else %}
+                      <div>
+                        <p>File does not exist</p>
+                      </div>
+                      {% endif %}
+                      {% if file.img %}
                       <div>
                         <a href="{{ file.img.url }}">Image: {{ file.img.name }}</a>
                       </div>
+                      {% else %}
+                      <div>
+                        <p>File does not exist</p>
+                      </div>
+                      {% endif %}
                     </td>
                     {% endfor %}
                     <td style="padding: 20px 40px">

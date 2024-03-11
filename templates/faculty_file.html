@@ -214,48 +214,53 @@ https://templatemo.com/tm-569-edu-meeting
         <div class="row">
           <!-- Contribution Container -->
           <div class="col-md-8 mx-auto">
-            {% if files %} {% for file in files %}
+            {% for contribution in contributions %}
             <div class="contribution-container">
+              {% for user_profile in contribution.user.all %}
               <div class="user-info">
-                <img
-                  src=""
-                  alt="User Avatar 1"
-                  width="40"
-                  height="40"
-                />
+                <!-- Giả sử bạn có trường avatar trong UserProfile, thay thế 'path_to_default_avatar' bằng đường dẫn avatar mặc định của bạn -->
+                <img src="{{ file.img.url }}" alt="{{ user_profile.fullname }}" width="40" height="40" />
                 <div class="user-details">
-                  <h4>User Name 1</h4>
-                  <h6>Post Date: March 6, 2024</h6>
+                  <h4>{{contribution.title}} - {{ user_profile.fullname }}</h4>
+                  <hr>
+                  <h6>Post Date: {{ contribution.createAt|date:"F d, Y" }}</h6>
                 </div>
               </div>
+              {% endfor %}
+              {% for file in contribution.files.all %}
               <div class="user-content">
                 {% if file.word %}
                 <li>
                   <h6>Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h6>
                 </li>
                 {% endif %}
+                <br>
                 {% if file.img %} 
                 <li>
                   <h6>Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h6>
                 </li>
                 {% endif %}
               </div>
+              {% endfor %}
+              {% if not is_guest %}
               <div class="feedback-box">
                 <h4>Feedback</h4>
                 <form action="" method="POST">
                   {% csrf_token %}
-                <div class="feedback-form">
-                  <input type="hidden" name="contribution_id" value="{{ file.contribution.id }}">
-                  <textarea name = "comment" placeholder="Leave your feedback..."></textarea>
-                  <button>Submit Feedback</button>
-                </div>
-              </form>
+                  <div class="feedback-form">
+                    <input type="hidden" name="contribution_id" value="{{ contribution.id }}">
+                    <textarea name="comment" placeholder="Leave your feedback..."></textarea>
+                    <button>Submit Feedback</button>
+                  </div>
+                </form>
               </div>
+              {% endif %}
             </div>
-            {% endfor %} {% else %}
+            {% empty %}
             <p>No files available for this faculty.</p>
-            {% endif %}
+            {% endfor %}
           </div>
+          
 
           <!-- Navigation Container -->
           <div class="col-md-4 mx-auto">
