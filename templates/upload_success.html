@@ -1,118 +1,36 @@
+{% extends "header.html" %}
 {%load static%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="TemplateMo">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
-  
-    <title>Education Meeting HTML5 Template</title>
-  
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  
-  
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}">
-    <link rel="stylesheet" href="{% static 'css/templatemo-edu-meeting.css' %}">
-    <link rel="stylesheet" href="{% static 'css/owl.css' %}">
-    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+{% block content %}
 
     <style>
-        .profile-container {
-            max-width: 450px;
-            margin: auto;
-            margin-top: 50px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 255, 255, 0.1);
-            text-align: left; /* Align text to the left */
-        }
+      .profile-container {
+          max-width: 450px;
+          margin: auto;
+          margin-top: 50px;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+          background-color: rgba(255, 255, 255, 0.1);
+          text-align: left; /* Align text to the left */
+      }
 
-        .profile-container h1 {
-            color: #fff;
-            text-align: center; /* Center the header text */
-        }
+      .profile-container h1 {
+          color: #fff;
+          text-align: center; /* Center the header text */
+      }
 
-        .btn-primary {
-            background-color: #2c2e3d;
-            border-color: #2c2e3d;
-            width: 60%;
-        }
+      .btn-primary {
+          background-color: #2c2e3d;
+          border-color: #2c2e3d;
+          width: 60%;
+      }
 
-        .btn-primary:hover {
-            background-color: #536881;
-            border-color: #536881;
-        }
+      .btn-primary:hover {
+          background-color: #536881;
+          border-color: #536881;
+      }
 
     </style>
-</head>
-<body>
-    <!-- ***** Header Area Start ***** -->
-    <header class="header-area header-sticky">
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <nav class="main-nav">
-              <!-- ***** Logo Start ***** -->
-              <a href="{% url "home" %}" class="logo">
-                Edu Meeting
-              </a>
-              <!-- ***** Logo End ***** -->
-              <!-- ***** Menu Start ***** -->
-              <ul class="nav">
-                <li>
-                  <a href="{% url "home" %}">Home</a>
-                </li>
-                <li>
-                  <a href="{% url "statistical_analysis" %}">Administator</a>
-                </li>
-                <li class="has-sub">
-                    <a href="javascript:void(0)">Contributions</a>
-                    <ul class="sub-menu">
-                      {%for f in faculties%}
-                      <li>
-                          <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
-                      </li>
-                      {%endfor%}
-                      <li>
-                          <a href="{%url 'show_contributions'%}">Download Contributions</a>
-                      </li>
-                      <li>
-                        <a href="{%url 'my_contributions'%}">View My</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                  <a href="{% url 'file_upload'%}" class="active">Upload Contributions</a>
-                </li>
-                {% if user.is_authenticated %}
-                <!-- Display the form or user-specific content -->
-                <li >
-                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
-                </li>
-                <li>
-                  <a href="{% url 'logout'%}">Logout</a>
-                </li>
-                {% else %}
-                <li>
-                  <a href="{% url 'login' %}">Login</a>
-                </li>
-                {% endif %}
-              </ul>
-              <a class='menu-trigger'>
-                <span>Menu</span>
-              </a>
-              <!-- ***** Menu End ***** -->
-            </nav>
-          </div>
-        </div>
-      </div>
-    </header>
-    <!-- ***** Header Area End ***** -->
 
     <section class="apply-now" id="apply">
         <div class="container profile-container">
@@ -224,3 +142,5 @@
     </script>
   </body>
 </html>
+
+{% endblock content %}

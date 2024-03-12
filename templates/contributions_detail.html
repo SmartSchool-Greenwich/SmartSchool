@@ -1,39 +1,6 @@
+{% extends "header.html" %}
 {%load static%}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta name="description" content="" />
-    <meta name="author" content="TemplateMo" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-
-    <link
-      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900"
-      rel="stylesheet"
-    />
-
-    <!-- Bootstrap core CSS -->
-    <link
-      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
-      rel="stylesheet"
-    />
-
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}" />
-    <link
-      rel="stylesheet"
-      href="{% static 'css/templatemo-edu-meeting.css' %}"
-    />
-    <link rel="stylesheet" href="{% static 'css/owl.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}" />
-
+{% block content %}
     <style>
       body {
         background-color: #f4f4f4;
@@ -106,70 +73,6 @@
         /* Add styling for navigation options */
       }
     </style>
-  </head>
-
-  <body>
-    <!-- ***** Header Area Start ***** -->
-    <header class="header-area header-sticky">
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <nav class="main-nav">
-              <!-- ***** Logo Start ***** -->
-              <a href="{% url "home" %}" class="logo">
-                Edu Meeting
-              </a>
-              <!-- ***** Logo End ***** -->
-              <!-- ***** Menu Start ***** -->
-              <ul class="nav">
-                <li>
-                  <a href="{% url "home" %}">Home</a>
-                </li>
-                <li>
-                  <a href="{% url "statistical_analysis" %}">Administator</a>
-                </li>
-                <li class="has-sub">
-                  <a href="javascript:void(0)" class="active">Contributions</a>
-                  <ul class="sub-menu">
-                    {%for f in faculties%}
-                    <li>
-                        <a href="{%url 'faculty_files' f.id%}">{{f.name}}</a>
-                    </li>
-                    {%endfor%}
-                    <li>
-                        <a href="{%url 'show_contributions'%}">Download Contributions</a>
-                    </li>
-                    <li>
-                      <a href="{%url 'my_contributions'%}">View My</a>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <a href="{% url 'file_upload'%}">Upload Contributions</a>
-                </li>
-                {% if user.is_authenticated %}
-                <li >
-                  <a href="{%url 'profile' %}">hello {{request.user.username}}</a>
-                </li>
-                <li>
-                  <a href="{% url 'logout'%}">Logout</a>
-                </li>
-                {% else %}
-                <li>
-                  <a href="{% url 'login' %}">Login</a>
-                </li>
-                {% endif %}
-              </ul>
-              <a class='menu-trigger'>
-                <span>Menu</span>
-              </a>
-              <!-- ***** Menu End ***** -->
-            </nav>
-          </div>
-        </div>
-      </div>
-    </header>
-    <!-- ***** Header Area End ***** -->
 
     <section class="apply-now" id="apply">
       <div class="header-content">
@@ -335,3 +238,5 @@
     </script>
   </body>
 </html>
+
+{% endblock content %}

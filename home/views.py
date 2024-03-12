@@ -89,10 +89,11 @@ def home(request):
             if academic_year and timezone.now() < academic_year.closure:
                 can_upload = True
 
-            if "admin" in roles or "marketing director" in roles:
+            if "marketing director" in roles:
                 faculties = Faculties.objects.all()
                 is_director = True
             elif "admin" in roles:
+                faculties = Faculties.objects.all()
                 is_admin = True
             elif "marketing coordinator" in roles:
                 faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
