@@ -602,7 +602,7 @@ def account_update(request, pk):
         })
 
 def account_delete(request, pk):
-    if request.method == 'POST':
+    if request.method == 'GET':
         account = get_object_or_404(UserProfile, pk=pk)
         account.delete()
         return redirect('account_list')

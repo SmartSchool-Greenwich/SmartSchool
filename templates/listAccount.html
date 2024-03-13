@@ -57,11 +57,7 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Accounts Management
                             </a>
-                            <div class="sb-sidenav-menu-heading">Contributions, Years and Faculties</div>
-                            <a class="nav-link" href="{% url "manage_contributions" %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                Contributions Approval
-                            </a>
+                            <div class="sb-sidenav-menu-heading">Academic Years and Faculties</div>
                             <a class="nav-link" href="{% url "list_academic_years" %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Academic Years
@@ -112,9 +108,9 @@
                                     <td>
                                       <a href="{% url 'account_edit' user_profile.user.id %}" class="btn btn-primary">Edit</a>
                                       |
-                                      <button class="btn btn-danger" onclick="confirmDelete('{{ user_profile.user.id }}')">
+                                      <a href="{% url 'account_delete' user_profile.user.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete?');">
                                         Delete
-                                      </button>
+                                      </a>                                      
                                     </td>
                                   </tr>
                                   {% endfor %}
