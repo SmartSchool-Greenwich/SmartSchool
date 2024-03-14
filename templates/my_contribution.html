@@ -42,6 +42,7 @@
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Created Time</th>
+                <th scope="col">Status</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
@@ -52,13 +53,18 @@
                   <td>{{ contribution.content|default:"No description provided" }}</td>
                   <td>{{ contribution.createAt|date:"H:i d-m-Y" }}</td>
                   <td>
+                    {% if contribution.status %}
+                        Approved
+                    {% else %}
+                        Waiting
+                    {% endif %}
+                  </td>
+                  <td>
                       {% if can_update %}
                       <a href="{% url 'update_contribution' pk=contribution.id %}" class="btn btn-primary btn-sm">Update</a> |  
                       {% endif %}
-                      {% if can_upload %}
                       <a href="{% url 'delete_contribution' contribution.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</a> | 
-                      {% endif %}
-                      <a href="{% url "contributions_detail" contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
+                      <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
                   </td>
               </tr>
             {% empty %}
@@ -158,6 +164,19 @@
 
       $(window).scroll(function () {
         checkSection();
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var rejectButtons = document.querySelectorAll('.reject-btn');
+        rejectButtons.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var contributionId = btn.getAttribute('data-contribution-id');
+            var form = document.getElementById('rejectForm');
+            form.action = '/ad/contribution/reject/' + contributionId + '/';
+            document.getElementById('contributionId').value = contributionId; // Set hidden input value
+          });
+        });
       });
     </script>
   </body>

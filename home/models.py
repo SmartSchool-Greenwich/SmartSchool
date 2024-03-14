@@ -9,7 +9,7 @@ class Role(models.Model):
         return self.name
     
     def get_marketing_coordinator_role():
-        return Role.objects.filter(name='marketing coordinator').first()
+        return Role.objects.filter(name='marketing cordinator').first()
 
     @classmethod
     def create_default_role(cls):
@@ -58,15 +58,17 @@ class Faculties(models.Model):
 class Contributions(models.Model):
     user = models.ManyToManyField(UserProfile)
     title = models.CharField(max_length=30)
-    status = models.BooleanField(default = False)
     content = models.TextField(null = True)
     faculty = models.ForeignKey(Faculties,on_delete=models.CASCADE)
     term = models.BooleanField(default=False)
     createAt = models.DateTimeField(auto_now_add=True)
     academic_Year = models.ForeignKey(AcademicYear,blank=True, null =True, on_delete=models.CASCADE)
-    
+    reject_reason = models.TextField(blank=True, null=True) 
+    status = models.CharField(max_length=10,  default='waiting')
+
     def __str__(self):
         return self.title
+
 
 class ContributionFiles(models.Model):
     word = models.FileField(null = True)

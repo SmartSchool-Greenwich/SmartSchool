@@ -14,3 +14,6 @@ class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ['name']
+
+class RejectForm(forms.Form):
+    reject_reason = forms.CharField(widget=forms.Textarea, label='Reason Reject')

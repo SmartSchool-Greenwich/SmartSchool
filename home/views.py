@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Count
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -73,7 +74,7 @@ def logout_view(request):
 def home(request):
     can_upload = True
     is_admin = False
-    is_coordinator = False
+    is_cordinator = False
     is_director = False
     is_student = False
     show_faculties = True  
@@ -95,9 +96,9 @@ def home(request):
             elif "admin" in roles:
                 faculties = Faculties.objects.all()
                 is_admin = True
-            elif "marketing coordinator" in roles:
+            elif "marketing cordinator" in roles:
                 faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
-                is_coordinator = True
+                is_cordinator = True
             else:
                 is_student = True
                 show_faculties = False
@@ -112,7 +113,7 @@ def home(request):
         'faculties': faculties,
         'can_upload': can_upload,
         'is_admin': is_admin,
-        'is_coordinator': is_coordinator,
+        'is_cordinator': is_cordinator,
         'is_director': is_director,
         'is_student': is_student,
         'show_faculties': show_faculties,
@@ -122,11 +123,12 @@ def home(request):
 
 def file_upload_view(request):
     faculties = None  # Initialize faculties to None or an empty list
-
+    
     if request.user.is_authenticated:
         user_profile = None
         faculties = None
         try:
+            is_student = True
             user_profile = request.user.userprofile
             if user_profile.academic_Year and user_profile.academic_Year.closure > timezone.now():
                 # User has a valid AcademicYear, so you can continue to the upload logic.
@@ -207,7 +209,8 @@ def file_upload_view(request):
             return redirect('home')
     
     else:
-        context = {'faculties': faculties}
+        context = {'faculties': faculties,
+                   'is_student': is_student}
         
     return render(request, 'upload.html', context)
 
@@ -311,12 +314,25 @@ def create_account(request):
 
 def faculty_files(request, faculty_id):
     is_guest = True
+    is_director = False
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    show_faculties = True 
+    faculty = user_profile.faculty
+    faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none() 
     if request.user.is_authenticated:
+        # academic_year = faculty.academicYear if faculty else None
+        roles = [role.name for role in user_profile.roles.all()]
+
+        # if academic_year and timezone.now() < academic_year.closure:
+        if "marketing director" in roles:
+            is_director = True
+            faculties = Faculties.objects.all() 
         is_guest = False
     faculty = get_object_or_404(Faculties, pk=faculty_id)
-    contributions = Contributions.objects.filter(faculty=faculty, status=True)
+    contributions = Contributions.objects.all()
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
-    comment_form = CommentForm()
+    comment_form = CommentForm()   
+
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -335,12 +351,31 @@ def faculty_files(request, faculty_id):
     return render(request, 'faculty_file.html', {'faculty': faculty, 
                                                  'files': files, 
                                                  'is_guest': is_guest,
-                                                 'contributions': contributions})
+                                                 'contributions': contributions,
+                                                 'faculties': faculties,
+                                                 'show_faculties': show_faculties,
+                                                 'is_director': is_director})
 
 def show_contributions(request):
-    contributions = Contributions.objects.filter(status=True)
+    is_director = False
+    show_faculties = True 
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    if request.user.is_authenticated:
+        # academic_year = faculty.academicYear if faculty else None
+        roles = [role.name for role in user_profile.roles.all()]
+
+        # if academic_year and timezone.now() < academic_year.closure:
+        if "marketing director" in roles:
+            is_director = True
+            faculties = Faculties.objects.all() 
+
+    contributions = Contributions.objects.filter(status="approved")
     
-    return render(request, 'show_contribution.html', {'contributions': contributions})
+    return render(request, 'show_contribution.html', {'contributions': contributions,
+                                                      'is_director': is_director,
+                                                      'show_faculties': show_faculties,
+                                                      'faculties' : faculties})
 
 
 def download_selected_contributions(request):
@@ -365,6 +400,28 @@ def download_selected_contributions(request):
 
 def update_profile(request):
     user_profile = get_object_or_404(UserProfile, user=request.user.userprofile)
+    show_faculties = True 
+    faculty = user_profile.faculty
+    faculties = Faculties.objects.none() 
+    is_cordinator = False
+    is_director = False
+    is_student = False
+
+    if request.user.is_authenticated:
+        # academic_year = faculty.academicYear if faculty else None
+        roles = [role.name for role in user_profile.roles.all()]
+
+        # if academic_year and timezone.now() < academic_year.closure:
+        if "marketing director" in roles:
+            faculties = Faculties.objects.all()
+            is_director = True
+        elif "marketing cordinator" in roles:
+            faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
+            is_cordinator = True
+        else:
+            is_student = True
+            show_faculties = False
+
     if request.method == 'POST':
         user_profile.fullname = request.POST.get('fullname', '')
         user_profile.email = request.POST.get('email', '')
@@ -372,14 +429,35 @@ def update_profile(request):
         user_profile.save()
         return redirect('home')
     else:
-        return render(request, 'update_profile.html', {'user_profile': user_profile})
+        return render(request, 'update_profile.html', {'user_profile': user_profile,
+                                                       'faculties': faculties,
+                                                       'show_faculties': show_faculties,
+                                                       'is_cordinator': is_cordinator,
+                                                       'is_director': is_director,
+                                                       'is_student': is_student})
 
 def contributions_detail(request, contribution_id):
     contribution = get_object_or_404(Contributions, id=contribution_id)
     comments = Comment.objects.filter(contribution=contribution)
     can_update = False 
+    user_profile = request.user.userprofile
+    show_faculties = True 
+    faculties = Faculties.objects.none() 
+    is_cordinator = False
+    is_student = False 
     
     if request.user.is_authenticated:
+        # academic_year = faculty.academicYear if faculty else None
+        roles = [role.name for role in user_profile.roles.all()]
+
+        # if academic_year and timezone.now() < academic_year.closure:
+        if "marketing cordinator" in roles:
+            faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
+            is_cordinator = True
+        else:
+            is_student = True
+            show_faculties = False
+
         try:
             user_profile = request.user.userprofile
             faculty = user_profile.faculty
@@ -416,11 +494,16 @@ def contributions_detail(request, contribution_id):
         'comment_form': comment_form,
         'file_form': file_form,
         'can_update': can_update,
+        'show_faculties': show_faculties,
+        'is_cordinator': is_cordinator,
+        'is_student': is_student,
+        'faculties': faculties,
     })    
 
 
 
 def my_contributions(request):
+    is_student = True
     user_profile = UserProfile.objects.get(user=request.user)
     contributions = Contributions.objects.filter(user=user_profile).prefetch_related('faculty', 'files')
     can_update = True
@@ -440,7 +523,8 @@ def my_contributions(request):
     
     context = {
         'can_update': can_update,
-        'contributions': contributions
+        'contributions': contributions,
+        'is_student': is_student
     }
     return render(request, 'my_contribution.html', context)
 
@@ -458,17 +542,37 @@ def remove_faculty(request, faculty_id):
 
 
 
-
-    
-
 @login_required
 def user_profile(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
-    return render(request, 'profile.html', {'user_profile': user_profile})
+    show_faculties = True 
+    faculty = user_profile.faculty
+    faculties = Faculties.objects.none() 
+    is_cordinator = False
+    is_director = False
+    is_student = False
 
+    if request.user.is_authenticated:
+        # academic_year = faculty.academicYear if faculty else None
+        roles = [role.name for role in user_profile.roles.all()]
 
+        # if academic_year and timezone.now() < academic_year.closure:
+        if "marketing director" in roles:
+            faculties = Faculties.objects.all()
+            is_director = True
+        elif "marketing cordinator" in roles:
+            faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
+            is_cordinator = True
+        else:
+            is_student = True
+            show_faculties = False
 
-
+    return render(request, 'profile.html', {'user_profile': user_profile,
+                                            'faculties': faculties,
+                                            'show_faculties': show_faculties,
+                                            'is_cordinator': is_cordinator,
+                                            'is_director': is_director,
+                                            'is_student': is_student})
 
 #academic
 def list_academic_years(request):
@@ -610,12 +714,10 @@ def account_update(request, pk):
     user_profile = get_object_or_404(UserProfile, pk=pk)
 
     if request.method == 'POST':
-        # Cập nhật thông tin cơ bản
         user_profile.fullname = request.POST.get('fullname')
         user_profile.email = request.POST.get('email')
         user_profile.phone = request.POST.get('phone')
 
-        # Cập nhật faculty
         faculty_id = request.POST.get('faculty')
         if faculty_id:
             user_profile.faculty = Faculties.objects.get(id=faculty_id)
@@ -624,7 +726,6 @@ def account_update(request, pk):
 
         user_profile.save()
 
-        # Cập nhật roles
         selected_roles = request.POST.getlist('roles')
         user_profile.roles.clear()
         for role_id in selected_roles:
@@ -666,3 +767,21 @@ def statistical_analysis(request):
         'approved_by_faculty': approved_counts,
     }
     return render(request, 'statistical_analysis.html', context)
+
+def approve_contribution(request, contribution_id):
+    contribution = get_object_or_404(Contributions, id=contribution_id)
+    contribution.status ='approved'
+    contribution.save()
+    return redirect('manage_contributions')
+
+@csrf_protect
+def reject_contribution(request, contribution_id):
+    if request.method == "POST":
+        contribution = get_object_or_404(Contributions, id=contribution_id)
+        reject_reason = request.POST.get("reject_reason")
+        contribution.reject_reason = reject_reason
+        contribution.status = 'rejected'
+        contribution.save()
+        return redirect('manage_contributions')
+    else:
+        return redirect('some_view')

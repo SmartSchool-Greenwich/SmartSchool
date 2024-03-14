@@ -109,7 +109,7 @@
               {% for user_profile in contribution.user.all %}
               <div class="user-info">
                 <!-- Giả sử bạn có trường avatar trong UserProfile, thay thế 'path_to_default_avatar' bằng đường dẫn avatar mặc định của bạn -->
-                <img src="{{ file.img.url }}" alt="{{ user_profile.fullname }}" width="40" height="40" />
+                <img src="#" alt="{{ user_profile.fullname }}" width="40" height="40" />
                 <div class="user-details">
                   <h4>{{contribution.title}} - {{ user_profile.fullname }}</h4>
                   <hr>
@@ -120,19 +120,21 @@
               {% for file in contribution.files.all %}
               <div class="user-content">
                 {% if file.word %}
-                <li>
-                  <h6>Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h6>
-                </li>
-                {% endif %}
-                <br>
-                {% if file.img %} 
-                <li>
-                  <h6>Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h6>
-                </li>
-                {% endif %}
+                  <div class="content">
+                    <h5 class="truncated">Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h5>
+                  </div>
+                  {% else %}
+                  <h5>Document: Do not have document files</h5>
+                  {% endif %} {% if file.img %}
+                  <div class="content">
+                    <h5 class="truncated">Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h5>
+                  </div>
+                  {% else %}
+                  <h5>Image: Do not have image files</h5>
+                  {% endif %}
               </div>
               {% endfor %}
-              {% if not is_guest %}
+              {% if not is_guest and not is_director %}
               <div class="feedback-box">
                 <h4>Feedback</h4>
                 <form action="" method="POST">

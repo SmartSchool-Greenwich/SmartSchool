@@ -85,17 +85,21 @@
                                         <td>{{ contribution.title }}</td>
                                         <td>{{ contribution.createAt }}</td>
                                         <td>
-                                            {% if contribution.status %}
+                                            {% if contribution.status == 'approved' %}
                                                 Approved
+                                            {% elif contribution.status == 'rejected' %}
+                                                Rejected
                                             {% else %}
                                                 Waiting
                                             {% endif %}
                                         </td>
                                         <td>
-                                          {% if not contribution.status %}
-                                              <a href="{% url 'approve_contribution' contribution.id %}?approve=app" class="btn btn-success">Approve</a>
-                                          {% else %}
-                                              <a href="{% url 'approve_contribution' contribution.id %}?approve=dis" class="btn btn-danger">Disapprove</a>
+                                          {% if contribution.status == 'waiting' %}
+                                              <a href="{% url 'approve_contribution' contribution.id %}" class="btn btn-success btn-sm">Approve</a> | 
+                                              <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
+                                              <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
+                                            {% else %}
+                                              {% comment %} <button disable class="btn btn-danger">Disapprove</button> {% endcomment %}
                                           {% endif %}
                                         </td>                  
                                     </tr>
@@ -104,6 +108,31 @@
                                 </table>
                               </form>
                             </div>
+                        </div>
+                    </div>
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="rejectModalLabel">Reject Contribution</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                            <form id="rejectForm" method="post" action="{% url 'reject_contribution' contribution_id=0 %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                <label for="rejectReason" class="col-form-label">Reject Reason:</label>
+                                <textarea class="form-control" id="rejectReason" name="reject_reason"></textarea>
+                                </div>
+                                <input type="hidden" id="contributionId" name="contribution_id">
+                            </form>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="rejectForm" class="btn btn-primary">Submit Reason</button>
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </main>
