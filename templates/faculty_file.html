@@ -120,11 +120,11 @@
               {% for file in contribution.files.all %}
               <div class="user-content">
                 {% if file.word %}
-                  <div class="content">
+                  <div class="content" style="margin-bottom: 10px;">
                     <h5 class="truncated">Document: <a href="{{ file.word.url }}">{{ file.word.name }}</a></h5>
                   </div>
                   {% else %}
-                  <h5>Document: Do not have document files</h5>
+                  <h5 style="margin-bottom: 10px;">Document: Do not have document files</h5>
                   {% endif %} {% if file.img %}
                   <div class="content">
                     <h5 class="truncated">Image: <a href="{{ file.img.url }}">{{ file.img.name }}</a></h5>

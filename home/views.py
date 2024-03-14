@@ -77,6 +77,7 @@ def home(request):
     is_cordinator = False
     is_director = False
     is_student = False
+    is_guest = False
     show_faculties = True  
     faculties = Faculties.objects.none() 
 
@@ -99,6 +100,9 @@ def home(request):
             elif "marketing cordinator" in roles:
                 faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
                 is_cordinator = True
+            elif "guest" in roles:
+                faculties = Faculties.objects.all()
+                is_guest = True
             else:
                 is_student = True
                 show_faculties = False
@@ -107,7 +111,7 @@ def home(request):
             can_upload = True
             show_faculties = False
     else:   
-        faculties = Faculties.objects.all()
+        show_faculties = False
         
     context = {
         'faculties': faculties,
@@ -116,6 +120,7 @@ def home(request):
         'is_cordinator': is_cordinator,
         'is_director': is_director,
         'is_student': is_student,
+        'is_guest': is_guest,
         'show_faculties': show_faculties,
     }
     return render(request, 'home.html', context)
@@ -313,7 +318,7 @@ def create_account(request):
 
 
 def faculty_files(request, faculty_id):
-    is_guest = True
+    is_guest = False
     is_director = False
     user_profile = get_object_or_404(UserProfile, user=request.user)
     show_faculties = True 
@@ -327,9 +332,11 @@ def faculty_files(request, faculty_id):
         if "marketing director" in roles:
             is_director = True
             faculties = Faculties.objects.all() 
-        is_guest = False
+        elif "guest" in roles:
+            is_guest = True
+            faculties = Faculties.objects.all() 
     faculty = get_object_or_404(Faculties, pk=faculty_id)
-    contributions = Contributions.objects.all()
+    contributions = Contributions.objects.filter(faculty_id=faculty_id)
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
     comment_form = CommentForm()   
 
@@ -443,6 +450,7 @@ def contributions_detail(request, contribution_id):
     user_profile = request.user.userprofile
     show_faculties = True 
     faculties = Faculties.objects.none() 
+    faculty = user_profile.faculty
     is_cordinator = False
     is_student = False 
     

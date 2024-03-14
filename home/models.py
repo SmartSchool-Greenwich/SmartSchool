@@ -15,6 +15,11 @@ class Role(models.Model):
     def create_default_role(cls):
         default_role, created = cls.objects.get_or_create(name='student')
         return default_role
+    
+    @classmethod
+    def get_or_create_guest_role(cls):
+        guest_role, created = cls.objects.get_or_create(name='guest')
+        return guest_role
 
 
 class AcademicYear(models.Model):
@@ -25,6 +30,7 @@ class AcademicYear(models.Model):
     def __str__(self):
         closure_date = self.closure.strftime('%Y-%m-%d')
         return f'Closure Date: {closure_date}'
+    
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     fullname = models.CharField(max_length=50)
@@ -44,8 +50,12 @@ class UserProfile(models.Model):
     def save(self, *args, **kwargs):
         super(UserProfile, self).save(*args, **kwargs)  
         if not self.roles.exists():  
-            default_role = Role.create_default_role()
-            self.roles.add(default_role)
+            if self.faculty is None:
+                guest_role = Role.get_or_create_guest_role()
+                self.roles.add(guest_role)
+            else:
+                default_role = Role.create_default_role()
+                self.roles.add(default_role)
 
 class Faculties(models.Model):
     name = models.CharField(max_length = 40)
