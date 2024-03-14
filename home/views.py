@@ -71,7 +71,7 @@ def logout_view(request):
     return redirect('home')
 
 def home(request):
-    can_upload = False
+    can_upload = True
     is_admin = False
     is_coordinator = False
     is_director = False
@@ -83,11 +83,11 @@ def home(request):
         try:
             user_profile = request.user.userprofile
             faculty = user_profile.faculty
-            academic_year = faculty.academicYear if faculty else None
+            # academic_year = faculty.academicYear if faculty else None
             roles = [role.name for role in user_profile.roles.all()]
 
-            if academic_year and timezone.now() < academic_year.closure:
-                can_upload = True
+            # if academic_year and timezone.now() < academic_year.closure:
+            #     can_upload = True
 
             if "marketing director" in roles:
                 faculties = Faculties.objects.all()
@@ -103,7 +103,7 @@ def home(request):
                 show_faculties = False
 
         except UserProfile.DoesNotExist:
-            can_upload = False
+            can_upload = True
             show_faculties = False
     else:   
         faculties = Faculties.objects.all()
@@ -121,37 +121,64 @@ def home(request):
 
 
 def file_upload_view(request):
+    faculties = None  # Initialize faculties to None or an empty list
+
     if request.user.is_authenticated:
+        user_profile = None
+        faculties = None
         try:
             user_profile = request.user.userprofile
-            user_faculty = user_profile.faculty
-            if user_faculty:
-                faculties = Faculties.objects.filter(id=user_faculty.id)
+            if user_profile.academic_Year and user_profile.academic_Year.closure > timezone.now():
+                # User has a valid AcademicYear, so you can continue to the upload logic.
+                user_faculty = user_profile.faculty
+                if user_faculty:
+                    faculties = Faculties.objects.filter(id=user_faculty.id)
+            else:
+                # Redirect to the page for entering AcademicYear code if AcademicYear is not valid
+                return redirect('enter_academic_year_code_url')
         except UserProfile.DoesNotExist:
-            pass  
+            # Handle the case where the user does not have a profile, according to your application's requirements
+            pass
         
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
         faculty_id = request.POST.get('faculty')
         term = request.POST.get('term') == 'on'
-        
+    
         try:
             faculty = Faculties.objects.get(id=faculty_id)
+        # Retrieve the current AcademicYear from the user's profile
+            current_academic_year = None
+            if request.user.userprofile.academic_Year:
+                current_academic_year = request.user.userprofile.academic_Year
+
+        # Create the contribution with the current AcademicYear
             contribution = Contributions.objects.create(
                 title=title,
                 content=content,
                 faculty=faculty,
-                term=term
+                term=term,
+                academic_Year=current_academic_year  # Assign the AcademicYear here
             )
             contribution.user.add(request.user.userprofile)
-            
-            contribution_file = ContributionFiles(contribution=contribution)  
+        
+        # Initialize the ContributionFiles instance outside the loop
+            contribution_file = ContributionFiles(contribution=contribution)
+        # Handle file uploads
+            files_uploaded = False  # Flag to check if any valid file was uploaded
             for file in request.FILES.getlist('word') + request.FILES.getlist('img'):
                 if file.name.endswith('.doc') or file.name.endswith('.docx'):
-                    contribution_file.word = file
-                else:
+                # Assuming 'word' field should only have one file
+                    if not contribution_file.word:
+                        contribution_file.word = file
+                        files_uploaded = True
+            # Exclude PDF files from being uploaded to 'img' field
+                elif not file.name.endswith('.pdf') and not contribution_file.img:
                     contribution_file.img = file
+                    files_uploaded = True
+        
+            if files_uploaded:
                 contribution_file.save()
             
             #sendmail
@@ -183,6 +210,24 @@ def file_upload_view(request):
         context = {'faculties': faculties}
         
     return render(request, 'upload.html', context)
+
+
+def enter_academic_year_code(request):
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        try:
+            academic_year = AcademicYear.objects.get(code=code)
+            user_profile = request.user.userprofile
+            user_profile.academic_Year = academic_year
+            user_profile.save()
+            if user_profile.academic_Year and user_profile.academic_Year.closure < timezone.now():
+                # User has a valid AcademicYear, so you can continue to the upload logic.
+                messages.error(request, 'You can not enroll to expired Academic Year.')
+            return redirect('file_upload')  # Assuming this is the URL name for file upload view
+        except AcademicYear.DoesNotExist:
+            messages.error(request, 'Invalid code or Academic Year has expired.')
+    
+    return render(request, 'enter_academic_year_code.html')
 
 def update_contribution(request, pk):
     contribution = get_object_or_404(Contributions, pk=pk)
@@ -338,7 +383,7 @@ def contributions_detail(request, contribution_id):
         try:
             user_profile = request.user.userprofile
             faculty = user_profile.faculty
-            academic_year = faculty.academicYear if faculty else None
+            academic_year = user_profile.academic_Year
             if academic_year and timezone.now() < academic_year.finalClosure:
                 can_update = True
         except UserProfile.DoesNotExist:
@@ -378,25 +423,22 @@ def contributions_detail(request, contribution_id):
 def my_contributions(request):
     user_profile = UserProfile.objects.get(user=request.user)
     contributions = Contributions.objects.filter(user=user_profile).prefetch_related('faculty', 'files')
-    can_upload = False 
-    can_update = False 
+    can_update = True
     
     if request.user.is_authenticated:
         try:
             user_profile = request.user.userprofile
             faculty = user_profile.faculty
-            academic_year = faculty.academicYear if faculty else None
-            if academic_year and timezone.now() < academic_year.closure:
-                can_upload = True
-            if academic_year and timezone.now() < academic_year.finalClosure:
-                can_update = True
+            academic_year = user_profile.academic_Year
+            if user_profile.academic_Year:
+                if academic_year and timezone.now() > academic_year.finalClosure:
+                    can_update = False
+
         except UserProfile.DoesNotExist:
-            can_upload = False
-            can_update = False 
+            can_update = True
 
     
     context = {
-        'can_upload': can_upload,
         'can_update': can_update,
         'contributions': contributions
     }
@@ -472,7 +514,7 @@ def remove_academic_year(request, year_id):
 
 #faculty
 def list_faculties(request):
-    faculties = Faculties.objects.all().select_related('academicYear')
+    faculties = Faculties.objects.all()
     return render(request, 'list_faculties.html', {'faculties': faculties})
 
 
@@ -481,9 +523,7 @@ def create_faculty(request):
     if request.method == "POST":
         name = request.POST.get('name')
         description = request.POST.get('description')
-        academicYear_id = request.POST.get('academicYear')
-        academicYear = AcademicYear.objects.get(id=academicYear_id)
-        Faculties.objects.create(name=name, description=description, academicYear=academicYear)
+        Faculties.objects.create(name=name, description=description)
         return redirect('list_faculties')
     academic_years = AcademicYear.objects.all()
     context = {

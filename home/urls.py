@@ -47,5 +47,6 @@ urlpatterns = [
     path('ad/accounts/delete/<int:pk>/', views.account_delete, name='account_delete'),
     
     path('ad/statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
+    path('enter-academic-year-code/', views.enter_academic_year_code, name='enter_academic_year_code_url'),
 
 ]

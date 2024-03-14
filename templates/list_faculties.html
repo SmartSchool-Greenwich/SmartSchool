@@ -87,7 +87,6 @@
                                     <tr>
                                       <th scope="col">Name</th>
                                       <th scope="col">Description</th>
-                                      <th scope="col">Academic Years</th>
                                       <th scope="col">Actions</th>
                                     </tr>
                                   </thead>
@@ -96,7 +95,6 @@
                                       <tr>
                                           <td>{{ faculty.name }}</td>
                                           <td>{{ faculty.description }}</td>
-                                          <td>From "{{ faculty.academicYear.closure|date:"d-m-Y" }}" to "{{ faculty.academicYear.finalClosure|date:"d-m-Y" }}"</td>
                                           <td>
                                               <a href="{% url 'update_faculty' faculty.id %}" class="btn btn-info btn-sm">Update</a>
                                               <a href="{% url 'remove_faculty' faculty.id %}" class="btn btn-danger btn-sm">Remove</a>

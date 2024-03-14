@@ -16,6 +16,15 @@ class Role(models.Model):
         default_role, created = cls.objects.get_or_create(name='student')
         return default_role
 
+
+class AcademicYear(models.Model):
+    closure = models.DateTimeField()
+    finalClosure = models.DateTimeField()
+    code = models.CharField(max_length = 6, blank=True)
+
+    def __str__(self):
+        closure_date = self.closure.strftime('%Y-%m-%d')
+        return f'Closure Date: {closure_date}'
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     fullname = models.CharField(max_length=50)
@@ -25,6 +34,8 @@ class UserProfile(models.Model):
     
     email = models.EmailField(max_length=254, unique=True, blank=True, null=True)
     phone = models.CharField(max_length=15)
+    
+    academic_Year = models.ForeignKey(AcademicYear,blank=True, null =True, on_delete=models.CASCADE)
     
 
     def __str__(self):
@@ -36,18 +47,9 @@ class UserProfile(models.Model):
             default_role = Role.create_default_role()
             self.roles.add(default_role)
 
-class AcademicYear(models.Model):
-    closure = models.DateTimeField()
-    finalClosure = models.DateTimeField()
-
-    def __str__(self):
-        closure_date = self.closure.strftime('%Y-%m-%d')
-        return f'Closure Date: {closure_date}'
-
 class Faculties(models.Model):
     name = models.CharField(max_length = 40)
     description = models.TextField(null =True)
-    academicYear = models.ForeignKey(AcademicYear, on_delete = models.CASCADE)
     def __str__(self):
         return self.name
     
@@ -61,6 +63,7 @@ class Contributions(models.Model):
     faculty = models.ForeignKey(Faculties,on_delete=models.CASCADE)
     term = models.BooleanField(default=False)
     createAt = models.DateTimeField(auto_now_add=True)
+    academic_Year = models.ForeignKey(AcademicYear,blank=True, null =True, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.title
