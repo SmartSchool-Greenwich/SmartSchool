@@ -98,7 +98,8 @@
                                             <div class="text-center">
                                             {% if contribution.status == 'waiting' %}
                                                 <a href="{% url 'approve_contribution' contribution.id %}" class="btn btn-success btn-sm">Approve</a> | 
-                                                <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
+                                                {% comment %} <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a>  {% endcomment %}
+                                                <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger reject-btn" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
                                                 <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
                                                 {% else %}
                                                 {% comment %} <button disable class="btn btn-danger">Disapprove</button> {% endcomment %}
@@ -122,31 +123,33 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Reject Modal -->
-                    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h5 class="modal-title" id="rejectModalLabel">Reject Contribution</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                            <form id="rejectForm" method="post" action="{% url 'reject_contribution' contribution_id=0 %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                <label for="rejectReason" class="col-form-label">Reject Reason:</label>
-                                <textarea class="form-control" id="rejectReason" name="reject_reason"></textarea>
-                                </div>
-                                <input type="hidden" id="contributionId" name="contribution_id">
-                            </form>
-                            </div>
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="rejectForm" class="btn btn-primary">Submit Reason</button>
-                            </div>
-                        </div>
-                        </div>
+                    
+                   <!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Reject Contribution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm" method="post" action="">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="rejectReason" class="col-form-label">Reject Reason:</label>
+                        <textarea class="form-control" id="rejectReason" name="reject_reason" required></textarea>
                     </div>
+                    <input type="hidden" id="contributionId" name="contribution_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="rejectForm" class="btn btn-primary">Submit Reason</button>
+            </div>
+        </div>
+    </div>
+</div>
+
                 </main>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
@@ -166,6 +169,19 @@
         <script src="{% static 'js/scripts.js' %}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var rejectButtons = document.querySelectorAll('.reject-btn');
+                rejectButtons.forEach(function(btn) {
+                  btn.addEventListener('click', function() {
+                    var contributionId = btn.getAttribute('data-contribution-id');
+                    var form = document.getElementById('rejectForm');
+                    form.action = '/ad/contribution/reject/' + contributionId + '/';
+                    document.getElementById('contributionId').value = contributionId; // Set hidden input value
+                  });
+                });
+              });
+            </script>
     </body>
 </html>
-     
