@@ -95,6 +95,8 @@
                                     <tr>
                                       <td>{{ year.closure|date:"Y-m-d" }}</td>
                                       <td>{{ year.finalClosure|date:"Y-m-d" }}</td>
+                                      <td>{{ year.code }}</td>
+
                                       <td>
                                         <a
                                           href="{% url 'update_academic_year' year.id %}"

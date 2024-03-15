@@ -596,7 +596,9 @@ def create_academic_year(request):
     if request.method == "POST":
         closure = request.POST.get('closure')
         finalClosure = request.POST.get('finalClosure')
-        AcademicYear.objects.create(closure=closure, finalClosure=finalClosure)
+        code = request.POST.get('code')
+
+        AcademicYear.objects.create(closure=closure, finalClosure=finalClosure,code=code)
         return redirect('list_academic_years')
     context = {
         'page' : page,
@@ -610,6 +612,7 @@ def update_academic_year(request, year_id):
     if request.method == "POST":
         academic_year.closure = request.POST.get('closure')
         academic_year.finalClosure = request.POST.get('finalClosure')
+        academic_year.code = request.POST.get('code')
         academic_year.save()
         return redirect('list_academic_years')
     context = {
