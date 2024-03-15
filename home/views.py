@@ -80,6 +80,8 @@ def home(request):
     is_guest = False
     show_faculties = True  
     faculties = Faculties.objects.none() 
+    
+    public_contributions = Contributions.objects.filter(public=True)
 
     if request.user.is_authenticated:
         try:
@@ -122,6 +124,7 @@ def home(request):
         'is_student': is_student,
         'is_guest': is_guest,
         'show_faculties': show_faculties,
+        'public_contributions': public_contributions,
     }
     return render(request, 'home.html', context)
 
@@ -699,15 +702,16 @@ def all_contributions_view(request):
     return render(request, 'manage_contributions.html', context)
 
 
-def approve_contribution(request, contribution_id):
+def public_contribution(request, contribution_id):
     contribution = get_object_or_404(Contributions, id=contribution_id)
-    status = request.GET.get('approve')
+    public = request.GET.get('public')
+    
     
     if request.method == "GET":
-        if status == "app":  # Được thay đổi từ "Approve" thành "app" cho phù hợp với tham số URL
-            contribution.status = True
-        elif status == "dis":  # Được thay đổi từ "Disapprove" thành "dis" cho phù hợp
-            contribution.status = False
+        if public == "pub":  # Được thay đổi từ "Approve" thành "app" cho phù hợp với tham số URL
+            contribution.public = True
+        elif public == "non":  # Được thay đổi từ "Disapprove" thành "dis" cho phù hợp
+            contribution.public = False
         contribution.save()
         return redirect('manage_contributions')
     else:

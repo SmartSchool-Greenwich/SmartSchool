@@ -37,6 +37,7 @@ urlpatterns = [
 
     path('ad/contributions/manage/', views.all_contributions_view, name='manage_contributions'),
     path('ad/contribution/approve/<int:contribution_id>/', views.approve_contribution, name='approve_contribution'),
+    path('ad/contribution/public/<int:contribution_id>/', views.public_contribution, name='public_contribution'),
     path('ad/contribution/reject/<int:contribution_id>/', views.reject_contribution, name='reject_contribution'),
 
     path('ad/accounts/', views.account_list, name='account_list'),
@@ -46,5 +47,6 @@ urlpatterns = [
     
     path('ad/statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
     path('enter-academic-year-code/', views.enter_academic_year_code, name='enter_academic_year_code_url'),
+    
 
 ]

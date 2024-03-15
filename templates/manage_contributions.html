@@ -70,7 +70,8 @@
                                       <th scope="col">Article Title</th>
                                       <th scope="col">Submission Date</th>
                                       <th scope="col">Status</th>
-                                      <th scope="col">Action</th>
+                                      <th class="text-center" scope="col">Action</th>
+                                      <th class="text-center" scope="col">Public Status </th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -94,14 +95,25 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                          {% if contribution.status == 'waiting' %}
-                                              <a href="{% url 'approve_contribution' contribution.id %}" class="btn btn-success btn-sm">Approve</a> | 
-                                              <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
-                                              <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
+                                            <div class="text-center">
+                                            {% if contribution.status == 'waiting' %}
+                                                <a href="{% url 'approve_contribution' contribution.id %}" class="btn btn-success btn-sm">Approve</a> | 
+                                                <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
+                                                <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
+                                                {% else %}
+                                                {% comment %} <button disable class="btn btn-danger">Disapprove</button> {% endcomment %}
+                                            {% endif %}
+                                            </div>
+                                        </td>      
+                                        <td>
+                                            <div class="text-center">
+                                            {% if contribution.public %}
+                                              <a href="{% url 'public_contribution' contribution.id %}?public=non" class="btn btn-danger btn-sm">Take Down</a>
                                             {% else %}
-                                              {% comment %} <button disable class="btn btn-danger">Disapprove</button> {% endcomment %}
-                                          {% endif %}
-                                        </td>                  
+                                                <a href="{% url 'public_contribution' contribution.id %}?public=pub" class="btn btn-success btn-sm">Push On</a>
+                                            {% endif %}
+                                          </div>
+                                        </td>            
                                     </tr>
                                     {% endfor %}
                                   </tbody>

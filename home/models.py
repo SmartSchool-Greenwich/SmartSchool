@@ -75,7 +75,7 @@ class Contributions(models.Model):
     academic_Year = models.ForeignKey(AcademicYear,blank=True, null =True, on_delete=models.CASCADE)
     reject_reason = models.TextField(blank=True, null=True) 
     status = models.CharField(max_length=10,  default='waiting')
-
+    public = models.BooleanField(default = False)
     def __str__(self):
         return self.title
 

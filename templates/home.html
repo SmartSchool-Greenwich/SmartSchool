@@ -35,58 +35,29 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="owl-service-item owl-carousel">
-
-            <div class="item">
-              <div class="icon">
-                <img src="assets/images/service-icon-01.png" alt="">
-              </div>
-              <div class="down-content">
-                <h4>Best Education</h4>
-                <p>Suspendisse tempor mauris a sem elementum bibendum. Praesent facilisis massa non vestibulum.</p>
-              </div>
+            {% for contribution in public_contributions %}
+            <div class="item" >
+                <div class="icon" style=" width: 100px; height: 100px;  object-fit: cover;" >
+                    {% with contribution.files.first as file %}
+                        {% if file and file.img %}
+                            <img src="{{ file.img.url }}" alt="{{ contribution.title }} icon">
+                        {% else %}
+                            <!-- Fallback icon if no image is set -->
+                            <img src="assets/images/default-icon.png" alt="Default Icon">
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="down-content">
+                    <h4>{{ contribution.title }}</h4>
+                    <p>{{ contribution.content|truncatewords:20 }}</p>
+                </div>
             </div>
-
+            {% empty %}
             <div class="item">
-              <div class="icon">
-                <img src="assets/images/service-icon-02.png" alt="">
-              </div>
-              <div class="down-content">
-                <h4>Best Teachers</h4>
-                <p>Suspendisse tempor mauris a sem elementum bibendum. Praesent facilisis massa non vestibulum.</p>
-              </div>
+                <p>No public contributions available.</p>
             </div>
-
-            <div class="item">
-              <div class="icon">
-                <img src="assets/images/service-icon-03.png" alt="">
-              </div>
-              <div class="down-content">
-                <h4>Best Students</h4>
-                <p>Suspendisse tempor mauris a sem elementum bibendum. Praesent facilisis massa non vestibulum.</p>
-              </div>
-            </div>
-
-            <div class="item">
-              <div class="icon">
-                <img src="assets/images/service-icon-02.png" alt="">
-              </div>
-              <div class="down-content">
-                <h4>Online Meeting</h4>
-                <p>Suspendisse tempor mauris a sem elementum bibendum. Praesent facilisis massa non vestibulum.</p>
-              </div>
-            </div>
-
-            <div class="item">
-              <div class="icon">
-                <img src="assets/images/service-icon-03.png" alt="">
-              </div>
-              <div class="down-content">
-                <h4>Best Networking</h4>
-                <p>Suspendisse tempor mauris a sem elementum bibendum. Praesent facilisis massa non vestibulum.</p>
-              </div>
-            </div>
-
-          </div>
+            {% endfor %}
+        </div>
         </div>
       </div>
     </div>
