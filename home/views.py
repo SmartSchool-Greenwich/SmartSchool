@@ -486,7 +486,7 @@ def contributions_detail(request, contribution_id):
                 new_comment.contribution = contribution
                 new_comment.user = request.user.userprofile
                 new_comment.save()
-                return HttpResponseRedirect(reverse('contribution_detail', args=[contribution_id]))
+                return HttpResponseRedirect(reverse('contributions_detail', args=[contribution_id]))
 
         elif request.FILES:
             file_form = FileForm(request.POST, request.FILES)
@@ -494,7 +494,7 @@ def contributions_detail(request, contribution_id):
                 new_file = file_form.save(commit=False)
                 new_file.contribution = contribution
                 new_file.save()
-                return HttpResponseRedirect(reverse('contribution_detail', args=[contribution_id]))
+                return HttpResponseRedirect(reverse('contributions_detail', args=[contribution_id]))
     else:
         comment_form = CommentForm()
         file_form = FileForm()

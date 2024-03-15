@@ -75,6 +75,35 @@
         padding: 20px;
         width: 100%;
       }
+
+      .feedback-box {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px;
+      }
+
+      .feedback-form {
+        margin-top: 10px;
+      }
+
+      .feedback-form textarea {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border-radius: 4px;
+        resize: vertical;
+      }
+
+      .feedback-form button {
+        margin-top: 10px;
+        padding: 6px 12px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
     </style>
 
     <section class="apply-now" id="apply">
@@ -125,11 +154,29 @@
               <div class="navigation-options">
                 <!-- Add your navigation options here -->
                 <h4 style="margin-bottom: 5px;">Contribution feedbacks:</h4>
-                {% for comment in comments %}
-                <p>
-                  <strong>{{ comment.user.fullname }}: </strong>{{comment.comment }}
-                </p>
-                {% endfor %}
+                <div class="feedback-box">
+                  {% if comments.count == 0 %}
+                    <p>
+                      <strong>No one has comment yet...</strong>
+                    </p>
+                  {% else %}
+                    {% for comment in comments %}
+                    <p>
+                      <strong>{{ comment.user.fullname }}: </strong>{{comment.comment }}
+                    </p>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="feedback-box">
+                <form action="" method="POST">
+                  {% csrf_token %}
+                  <div class="feedback-form">
+                    <input type="hidden" name="contribution_id" value="{{ contribution.id }}">
+                    <textarea name="comment" placeholder="Leave your comment..."></textarea>
+                    <button>Submit Feedback</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
