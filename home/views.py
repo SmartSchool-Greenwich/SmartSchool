@@ -365,6 +365,7 @@ def faculty_files(request, faculty_id):
                                                  'faculties': faculties,
                                                  'show_faculties': show_faculties,
                                                  'is_director': is_director})
+                                                 
 
 def show_contributions(request):
     is_director = False
@@ -596,9 +597,7 @@ def create_academic_year(request):
     if request.method == "POST":
         closure = request.POST.get('closure')
         finalClosure = request.POST.get('finalClosure')
-        code = request.POST.get('code')
-
-        AcademicYear.objects.create(closure=closure, finalClosure=finalClosure,code=code)
+        AcademicYear.objects.create(closure=closure, finalClosure=finalClosure)
         return redirect('list_academic_years')
     context = {
         'page' : page,
@@ -612,7 +611,6 @@ def update_academic_year(request, year_id):
     if request.method == "POST":
         academic_year.closure = request.POST.get('closure')
         academic_year.finalClosure = request.POST.get('finalClosure')
-        academic_year.code = request.POST.get('code')
         academic_year.save()
         return redirect('list_academic_years')
     context = {
@@ -800,3 +798,6 @@ def reject_contribution(request, contribution_id):
         return redirect('manage_contributions')
     else:
         return redirect('some_view')
+    
+def term_policy(request):
+    return render(request, 'terms_policies.html')

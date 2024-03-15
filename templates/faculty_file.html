@@ -136,10 +136,9 @@
                   {% endif %}
               </div>
               {% endfor %}
-
-
               {% if not is_guest and not is_director %}
               <div class="feedback-box">
+              <h5 style="margin-bottom: 5px;">Contribution feedbacks:</h5>
               {% for file in contribution.files.all %}
                 {% if contribution.comments.count == 0 %}
                   <p>
@@ -153,18 +152,17 @@
                   {% endfor %}
                 {% endif %}
               {% endfor %}
-                </div>
-                <div class="feedback-box">
-                  <h5 style="margin-bottom: 5px;">Contribution feedbacks:</h5>
-                  <form action="" method="POST">
-                    {% csrf_token %}
-                    <div class="feedback-form">
-                      <input type="hidden" name="contribution_id" value="{{ contribution.id }}">
-                      <textarea name="comment" placeholder="Leave your comment..."></textarea>
-                      <button>Submit Feedback</button>
-                    </div>
-                  </form>
-                </div>
+              </div>
+              <div class="feedback-box">
+                <form action="" method="POST">
+                  {% csrf_token %}
+                  <div class="feedback-form">
+                    <input type="hidden" name="contribution_id" value="{{ contribution.id }}">
+                    <textarea name="comment" placeholder="Leave your comment..."></textarea>
+                    <button>Submit Feedback</button>
+                  </div>
+                </form>
+              </div>
             </div>
             {% endif %}
             {% empty %}

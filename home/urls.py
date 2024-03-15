@@ -47,6 +47,8 @@ urlpatterns = [
     
     path('ad/statistical-analysis/', views.statistical_analysis, name='statistical_analysis'),
     path('enter-academic-year-code/', views.enter_academic_year_code, name='enter_academic_year_code_url'),
+
+    path('terms_policies/', views.term_policy, name='term_policy'),
     
 
 ]
