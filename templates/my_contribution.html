@@ -53,8 +53,10 @@
                   <td>{{ contribution.content|default:"No description provided" }}</td>
                   <td>{{ contribution.createAt|date:"H:i d-m-Y" }}</td>
                   <td>
-                    {% if contribution.status %}
+                    {% if contribution.status == 'approved' %}
                         Approved
+                    {% elif contribution.status == 'rejected' %}
+                        Rejected
                     {% else %}
                         Waiting
                     {% endif %}

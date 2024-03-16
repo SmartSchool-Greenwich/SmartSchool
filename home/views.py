@@ -323,10 +323,13 @@ def create_account(request):
 def faculty_files(request, faculty_id):
     is_guest = False
     is_director = False
+    is_cordinator = False
     user_profile = get_object_or_404(UserProfile, user=request.user)
     show_faculties = True 
     faculty = user_profile.faculty
-    faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none() 
+    faculties = Faculties.objects.none() 
+    contributions = Contributions.objects.filter(faculty_id=faculty_id)
+
     if request.user.is_authenticated:
         # academic_year = faculty.academicYear if faculty else None
         roles = [role.name for role in user_profile.roles.all()]
@@ -335,11 +338,15 @@ def faculty_files(request, faculty_id):
         if "marketing director" in roles:
             is_director = True
             faculties = Faculties.objects.all() 
+        elif "marketing cordinator" in roles:
+            is_cordinator = True
+            faculties = Faculties.objects.filter(id=faculty.id) if faculty else Faculties.objects.none()
         elif "guest" in roles:
             is_guest = True
             faculties = Faculties.objects.all() 
+            contributions = Contributions.objects.filter(faculty_id=faculty_id, status="approved")
+
     faculty = get_object_or_404(Faculties, pk=faculty_id)
-    contributions = Contributions.objects.filter(faculty_id=faculty_id)
     files = ContributionFiles.objects.filter(contribution__in=contributions).distinct()
     comment_form = CommentForm()   
 
@@ -364,7 +371,8 @@ def faculty_files(request, faculty_id):
                                                  'contributions': contributions,
                                                  'faculties': faculties,
                                                  'show_faculties': show_faculties,
-                                                 'is_director': is_director})
+                                                 'is_director': is_director,
+                                                 'is_cordinator': is_cordinator})
                                                  
 
 def show_contributions(request):
