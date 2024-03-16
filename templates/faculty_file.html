@@ -92,8 +92,27 @@
         padding: 20px;
         width: 100%;
       }
-      .navigation-options {
-        /* Add styling for navigation options */
+
+      .user-information p{
+        color: #fff;
+        font-size: 18px;
+        margin: 10px 0;
+      }
+
+      .profile-container {
+          max-width: 450px;
+          margin: auto;
+          margin-top: 50px;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+          background-color: rgba(255, 255, 255, 0.1);
+          text-align: left; /* Align text to the left */
+      }
+
+      .profile-container h4 {
+          color: #fff;
+          text-align: center; /* Center the header text */
       }
     </style>
 
@@ -167,11 +186,14 @@
               {% endif %}
             </div>
             {% empty %}
-            <p>No files available for this faculty.</p>
+            <div class="container profile-container">
+              <h4>No files available in this faculty!</h4>
+              <div class="user-information text-center">
+                  <p>You can check for other.</p>
+              </div>
+            </div>
             {% endfor %}
           </div>
-
-          
 
           <!-- Navigation Container -->
           {% comment %} <div class="col-md-4 mx-auto">
@@ -187,32 +209,20 @@
               </div>
             </div>
           </div>  {% endcomment %}
+          
         </div>
       </div>
     </section>
 
     <section class="contact-us" id="contact">
       <div class="footer">
-        <p>
-          Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
-          <br />
-          Design:
-          <a
-            href="https://templatemo.com"
-            target="_parent"
-            title="free css templates"
-            >TemplateMo</a
-          >
-          <br />
-          Distibuted By:
-          <a
-            href="https://themewagon.com"
-            target="_blank"
-            title="Build Better UI, Faster"
-            >ThemeWagon</a
-          >
-        </p>
-      </div>
+      <p>Copyright © 2022 Edu Meeting Co., Ltd. All Rights Reserved.
+        <br>
+        Design: <a href="#" target="_parent" title="free css templates">Trinh, Khoi, Kiet, Ratana and Hieu.</a>
+        <br>
+        Distibuted By: <a href="#" target="_blank" title="Build Better UI, Faster">Edu Meeting Inc.</a>
+      </p>
+    </div>
     </section>
 
     <!-- Bootstrap JS and Popper.js are required for Bootstrap functionality -->
