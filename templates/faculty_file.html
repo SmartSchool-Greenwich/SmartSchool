@@ -113,8 +113,9 @@
                 <!-- Giả sử bạn có trường avatar trong UserProfile, thay thế 'path_to_default_avatar' bằng đường dẫn avatar mặc định của bạn -->
                 <img src="#" alt="{{ user_profile.fullname }}" width="40" height="40" />
                 <div class="user-details">
-                  <h4>{{contribution.title}} - {{ user_profile.fullname }}</h4>
+                  <h4>Title: {{contribution.title}}</h4>
                   <hr>
+                  <h6>Contributor: {{ user_profile.fullname }}</h6>
                   <h6>Post Date: {{ contribution.createAt|date:"F d, Y" }}</h6>
                 </div>
               </div>
@@ -138,20 +139,20 @@
               {% endfor %}
               {% if not is_guest and not is_director %}
               <div class="feedback-box">
-              <h5 style="margin-bottom: 5px;">Contribution feedbacks:</h5>
-              {% for file in contribution.files.all %}
-                {% if contribution.comments.count == 0 %}
-                  <p>
-                    <strong>No one has comment yet...</strong>
-                  </p>
-                {% else %}
-                  {% for comment in comments %}
-                  <p>
-                    <strong>{{ comment.user.fullname }}: </strong>{{comment.comment }}
-                  </p>
-                  {% endfor %}
-                {% endif %}
-              {% endfor %}
+                <h5 style="margin-bottom: 5px;">Contribution feedbacks:</h5>
+                {% for file in contribution.files.all %}
+                  {% if contribution.comments.count == 0 %}
+                    <p>
+                      <strong>No one has comment yet...</strong>
+                    </p>
+                  {% else %}
+                    {% for comment in comments %}
+                    <p>
+                      <strong>{{ comment.user.fullname }}: </strong>{{comment.comment }}
+                    </p>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
               </div>
               <div class="feedback-box">
                 <form action="" method="POST">
@@ -163,12 +164,13 @@
                   </div>
                 </form>
               </div>
+              {% endif %}
             </div>
-            {% endif %}
             {% empty %}
             <p>No files available for this faculty.</p>
             {% endfor %}
           </div>
+
           
 
           <!-- Navigation Container -->
@@ -184,7 +186,7 @@
                 </ul>
               </div>
             </div>
-          </div> {% endcomment %}
+          </div>  {% endcomment %}
         </div>
       </div>
     </section>

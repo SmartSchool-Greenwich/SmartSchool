@@ -101,11 +101,8 @@
               name="term"
               id="id_term"
               onclick="toggleUploadButton()"
-            /> I completely agree with the terms and policies.</label>
+            /> I completely agree with <a href="{% url "term_policy" %}">EDU MEETING's terms and policies.</a></label>
             <input type="submit" value="Upload" id="uploadButton" />
-            <div class="text-center">
-              <a href="{% url "term_policy" %}">EDU MEETING's Terms and Policies.</a>
-            </div>
           </form>
         </section>
       </div>
