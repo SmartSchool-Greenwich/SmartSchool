@@ -250,6 +250,7 @@ def update_contribution(request, pk):
         contribution.title = title
         contribution.content = content
         contribution.term = term
+        contribution.status = "waiting"
         contribution.save()
 
         word_file = request.FILES.get('word', None)
@@ -282,7 +283,13 @@ def delete_contribution(request, pk):
 
 
 def upload_success(request):
-    return render(request, 'upload_success.html')
+    is_student = True
+    show_faculties = True
+    context = {
+        'is_student': is_student,
+        'show_faculties': show_faculties
+    }
+    return render(request, 'upload_success.html', context)
 
 def create_account(request):
     if request.method == 'POST':

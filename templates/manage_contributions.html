@@ -98,11 +98,13 @@
                                             <div class="text-center">
                                             {% if contribution.status == 'waiting' %}
                                                 <a href="{% url 'approve_contribution' contribution.id %}" class="btn btn-success btn-sm">Approve</a> | 
-                                                {% comment %} <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a>  {% endcomment %}
-                                                <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger reject-btn" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
+                                                <a href="{% url 'reject_contribution' contribution.id %}" class="btn btn-danger reject-btn btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-contribution-id="{{ contribution.id }}">Reject</a> | 
                                                 <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
-                                                {% else %}
-                                                {% comment %} <button disable class="btn btn-danger">Disapprove</button> {% endcomment %}
+                                            {% elif contribution.status == 'approved' %}
+                                                <a href="#" class="btn btn-danger btn-sm">Disapprove</a> | 
+                                                <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
+                                            {% elif contribution.status == 'rejected' %}
+                                                <a href="{% url 'contributions_detail' contribution.id %}" class="btn btn-warning btn-sm">View Detail</a>
                                             {% endif %}
                                             </div>
                                         </td>      

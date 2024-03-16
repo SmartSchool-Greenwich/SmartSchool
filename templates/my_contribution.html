@@ -62,7 +62,7 @@
                     {% endif %}
                   </td>
                   <td>
-                      {% if can_update %}
+                      {% if can_update and not contribution.status == 'approved' %}
                       <a href="{% url 'update_contribution' pk=contribution.id %}" class="btn btn-primary btn-sm">Update</a> |  
                       {% endif %}
                       <a href="{% url 'delete_contribution' contribution.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</a> | 
