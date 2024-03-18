@@ -1,0 +1,93 @@
+@startuml
+
+' - private
+' + public 
+' ~ internal 
+' # protected
+
+skinparam ClassAttributeIconSize 0
+
+class User {
+    - username: string
+    - password: string
+    - email: string
+    - userProfile: UserProfile
+    - role: Role
+    
+    + authenticate()
+    + login()
+    + logout()
+}
+
+class UserProfile {
+    - user: User
+    - fullname: string
+    - email: string
+    - phone: string
+    - faculty: Faculties
+    
+    + save()
+}
+
+class Faculties {
+    - name: string
+    - description: string
+    - academicYear: AcademicYear
+    
+    + save()
+}
+
+class Contributions {
+    - title: string
+    - content: string
+    - faculty: Faculties
+    - term: bool
+    - academicYear: AcademicYear
+    - public: bool
+    - user: UserProfile
+    - status: string
+    - reject_reason: string
+    - contributionFiles: ContributionFiles
+    
+    + save()
+}
+
+class ContributionFiles {
+    - word: FileField
+    - img: FileField
+    
+    + save()
+}
+
+class Role {
+    - name: string
+    
+    + get_marketing_coordinator_role()
+}
+
+class AcademicYear {
+    - code: string
+    - closure: DateTimeField
+    - finalClosure: DateTimeField
+    
+    + save()
+}
+
+class Comment {
+    - user: UserProfile
+    - contribution: Contributions
+    - content: string
+    - created_at: DateTimeField
+    
+    + save()
+}
+
+User "1" -- "1" UserProfile: owns
+User "1" -- "1" Role: has
+UserProfile "1" -- "1" Faculties: belongs to
+Faculties "1" -- "*" Contributions: contains
+Contributions "*" -- "1" ContributionFiles: owns
+AcademicYear "1" -- "1" Faculties: belongs to
+Contributions "*" -- "*" Comment: has
+
+@enduml
